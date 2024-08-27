@@ -11,7 +11,7 @@ public class TaskManager {
     private HashMap<Integer, Epic> epics;
     private HashMap<Integer, Subtask> subtasks;
 
-    private Integer lastId;
+    private Integer lastId = 0;
 
     public TaskManager() {
         tasks = new HashMap<>();
@@ -37,6 +37,9 @@ public class TaskManager {
 
     public void addEpic(Epic epic) {
         epics.put(++lastId, epic);
+        for (Task task : epic.getTasks()) {
+            tasks.put(++lastId, task);
+        }
     }
 
     public void addSubtask(Subtask subtask) {

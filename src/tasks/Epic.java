@@ -1,24 +1,24 @@
 package tasks;
 
 public class Epic extends Task {
-    private Task[] tasks;
+    private Subtask[] subtasks;
 
-    public Epic(String name, String description, Status status, Task[] tasks) {
+    public Epic(String name, String description, Status status, Subtask[] subtasks) {
         super(name, description, status);
-        this.tasks = tasks;
+        this.subtasks = subtasks;
     }
 
-    public Task[] getTasks() {
-        return tasks;
+    public Subtask[] getTasks() {
+        return subtasks;
     }
 
     @Override
     public Status getStatus() {
         int newCounter = 0;
-        if (tasks.length == 0) {
+        if (subtasks.length == 0) {
             return Status.NEW;
         }
-        for (Task task : tasks) {
+        for (Task task : subtasks) {
             if (task.getStatus() != Status.DONE) {
                 return Status.IN_PROGRESS;
             }
@@ -27,7 +27,7 @@ public class Epic extends Task {
             }
         }
 
-        if (newCounter == tasks.length) {
+        if (newCounter == subtasks.length) {
             return Status.NEW;
         }
 
