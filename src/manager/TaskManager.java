@@ -53,14 +53,54 @@ public class TaskManager {
         }
     }
 
+
+    public void updateSubtask(Integer id, Subtask subtask) {
+        if (subtasks.containsKey(id)) {
+            subtasks.put(id, subtask);
+        }
+    }
+
+    public void updateEpic(Integer id, Epic epic) {
+        if (epics.containsKey(id)) {
+            epics.put(id, epic);
+        }
+    }
+
     public void updateTask(Integer id, Task task) {
         if (tasks.containsKey(id)) {
             tasks.put(id, task);
-        } else if (epics.containsKey(id)) {
-            epics.put(id, (Epic) task);
-        } else if (subtasks.containsKey(id)) {
-            subtasks.put(id, (Subtask) task);
         }
+    }
+
+    public Task getTask(Integer id) {
+        return tasks.get(id);
+    }
+
+    public Epic getEpic(Integer id) {
+        return epics.get(id);
+    }
+
+    public Subtask getSubtask(Integer id) {
+        return subtasks.get(id);
+    }
+
+    public void deleteTask(Integer id) {
+        if (tasks.containsKey(id)) {
+            tasks.remove(id);
+        } else if (epics.containsKey(id)) {
+            epics.remove(id);
+        } else if (subtasks.containsKey(id)) {
+            subtasks.remove(id);
+        }
+    }
+
+    public Task[] getEpicTasks(Integer id) {
+        if (epics.containsKey(id)) {
+            Epic epic = epics.get(id);
+            return epic.getTasks();
+        }
+
+        return new Task[0];
     }
 
     public void deleteAll() {
