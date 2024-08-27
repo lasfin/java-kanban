@@ -1,3 +1,4 @@
+import manager.TaskManager;
 import tasks.Epic;
 import tasks.Status;
 import tasks.Subtask;
@@ -14,9 +15,9 @@ public class Main {
 
         // Create a new epic
         Task[] tasks = new Task[3];
-        tasks[0] = new Task("Task 1", "Task 1 description", Status.NEW.DONE);
+        tasks[0] = new Task("Task 1", "Task 1 description", Status.NEW);
         tasks[1] = new Task("Task 2", "Task 2 description", Status.IN_PROGRESS);
-        tasks[2] = new Task("Task 3", "Task 3 description", Status.NEW);
+        tasks[2] = new Task("Task 3", "Task 3 description", Status.DONE);
         Epic epic = new Epic("Create a new epic", "Create a new epic for the project", Status.NEW, tasks);
         System.out.println("Epic Name: " + epic.getName());
         System.out.println("Epic Description: " + epic.getDescription());
@@ -28,5 +29,12 @@ public class Main {
         System.out.println("Subtask Description: " + subtask.getDescription());
         System.out.println("Subtask Status: " + subtask.getStatus());
         System.out.println("Subtask Parent Task: " + subtask.getParentTask().getName());
+
+
+        // Create a new task manager
+        TaskManager taskManager = new TaskManager();
+        taskManager.addTask(task);
+        taskManager.addEpic(epic);
+        taskManager.addSubtask(subtask);
     }
 }
