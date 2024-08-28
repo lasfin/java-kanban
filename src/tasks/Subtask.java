@@ -8,6 +8,14 @@ public class Subtask extends Task {
         this.parentTask = parentTask;
     }
 
+    @Override public String toString() {
+        if (parentTask == null) {
+            return super.toString() + " - Parent task: null";
+        }
+
+        return super.toString() + " - Parent task: " + parentTask.getName();
+    }
+
     public Task getParentTask() {
         return parentTask;
     }

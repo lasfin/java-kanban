@@ -13,7 +13,11 @@ public class Epic extends Task {
         }
     }
 
-    public ArrayList<Subtask> getTasks() {
+    @Override public String toString() {
+        return super.toString() + " - Subtasks: " + subtasks.size();
+    }
+
+    public ArrayList<Subtask> getSubtasks() {
         return subtasks;
     }
 
@@ -23,11 +27,11 @@ public class Epic extends Task {
         if (subtasks.isEmpty()) {
             return Status.NEW;
         }
-        for (Task task : subtasks) {
-            if (task.getStatus() != Status.DONE) {
+        for (Subtask subtask : subtasks) {
+            if (subtask.getStatus() == Status.IN_PROGRESS) {
                 return Status.IN_PROGRESS;
             }
-            if (task.getStatus() == Status.NEW) {
+            if (subtask.getStatus() == Status.NEW) {
                 newCounter++;
             }
         }

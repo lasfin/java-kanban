@@ -11,6 +11,11 @@ public class Task {
         this.status = status;
     }
 
+    @Override
+    public String toString() {
+        return getName() + " - " + getDescription() + " - " + getStatus();
+    }
+
     public String getName() {
         return name;
     }

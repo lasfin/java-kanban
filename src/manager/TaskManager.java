@@ -38,8 +38,8 @@ public class TaskManager {
 
     public void addEpic(Epic epic) {
         epics.put(++lastId, epic);
-        for (Task task : epic.getTasks()) {
-            tasks.put(++lastId, task);
+        for (Subtask subtask : epic.getSubtasks()) {
+            subtasks.put(++lastId, subtask);
         }
     }
 
@@ -101,7 +101,7 @@ public class TaskManager {
     public ArrayList<Subtask> getEpicTasks(Integer id) {
         if (epics.containsKey(id)) {
             Epic epic = epics.get(id);
-            return epic.getTasks();
+            return epic.getSubtasks();
         }
 
         return new ArrayList<>();

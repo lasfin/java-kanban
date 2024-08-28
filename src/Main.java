@@ -15,14 +15,14 @@ public class Main {
 
         // Create a new epic (with 2 subtask)
         ArrayList<Subtask> subtasks = new ArrayList<>();
-        subtasks.add(new Subtask("Task 1", "Task 1 description", Status.NEW, null));
-        subtasks.add(new Subtask("Task 2", "Task 2 description", Status.IN_PROGRESS, null));
-        Epic epic1 = new Epic("Create a new epic", "Create a new epic for the project", Status.NEW, subtasks);
+        subtasks.add(new Subtask("Subtask 1", "Subtask 1 description", Status.NEW, null));
+        subtasks.add(new Subtask("Subtask 2", "Subtask 2 description", Status.IN_PROGRESS, null));
+        Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW, subtasks);
 
         // create a new epic (with 1 subtask)
         ArrayList<Subtask> subtasks1 = new ArrayList<>();
-        subtasks1.add(new Subtask("Task 1", "Task 1 description", Status.NEW, null));
-        Epic epic2 = new Epic("Create a new epic", "Create a new epic for the project", Status.NEW, subtasks1);
+        subtasks1.add(new Subtask("Subtask 3", "Subtask 3 description", Status.NEW, null));
+        Epic epic2 = new Epic("Epic 2", "Some text", Status.NEW, subtasks1);
 
         TaskManager taskManager = new TaskManager();
         taskManager.addTask(task1);
@@ -30,15 +30,20 @@ public class Main {
         taskManager.addEpic(epic1);
         taskManager.addEpic(epic2);
 
+        System.out.println("All tasks:");
         for (Task task : taskManager.getTasks().values()) {
             System.out.println(task);
         }
+        System.out.println("All epics:");
         for (Epic epic : taskManager.getEpics().values()) {
             System.out.println(epic);
         }
+        System.out.println("All subtasks:");
         for (Subtask subtask : taskManager.getSubtasks().values()) {
             System.out.println(subtask);
         }
+
+
 
     }
 }
