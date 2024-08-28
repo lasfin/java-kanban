@@ -1,21 +1,26 @@
 package tasks;
 
-public class Epic extends Task {
-    private Subtask[] subtasks;
+import java.util.ArrayList;
 
-    public Epic(String name, String description, Status status, Subtask[] subtasks) {
+public class Epic extends Task {
+    private ArrayList<Subtask> subtasks;
+
+    public Epic(String name, String description, Status status, ArrayList<Subtask> subtasks) {
         super(name, description, status);
         this.subtasks = subtasks;
+        for (Subtask subtask : subtasks) {
+            subtask.setParentTask(this);
+        }
     }
 
-    public Subtask[] getTasks() {
+    public ArrayList<Subtask> getTasks() {
         return subtasks;
     }
 
     @Override
     public Status getStatus() {
         int newCounter = 0;
-        if (subtasks.length == 0) {
+        if (subtasks.isEmpty()) {
             return Status.NEW;
         }
         for (Task task : subtasks) {
@@ -27,7 +32,7 @@ public class Epic extends Task {
             }
         }
 
-        if (newCounter == subtasks.length) {
+        if (newCounter == subtasks.size()) {
             return Status.NEW;
         }
 

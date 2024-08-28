@@ -4,6 +4,7 @@ import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskManager {
@@ -97,13 +98,13 @@ public class TaskManager {
         }
     }
 
-    public Task[] getEpicTasks(Integer id) {
+    public ArrayList<Subtask> getEpicTasks(Integer id) {
         if (epics.containsKey(id)) {
             Epic epic = epics.get(id);
             return epic.getTasks();
         }
 
-        return new Task[0];
+        return new ArrayList<>();
     }
 
     public void deleteAll() {

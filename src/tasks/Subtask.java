@@ -11,4 +11,8 @@ public class Subtask extends Task {
     public Task getParentTask() {
         return parentTask;
     }
+
+    public void setParentTask(Task parentTask) {
+        this.parentTask = parentTask;
+    }
 }

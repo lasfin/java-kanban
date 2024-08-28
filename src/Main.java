@@ -4,6 +4,8 @@ import tasks.Status;
 import tasks.Subtask;
 import tasks.Task;
 
+import java.util.ArrayList;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -12,15 +14,15 @@ public class Main {
         Task task2 = new Task("Create a second task", "Create a second task for the project", Status.NEW);
 
         // Create a new epic (with 2 subtask)
-        Subtask[] tasks = new Subtask[2];
-        Epic epic1 = new Epic("Create a new epic", "Create a new epic for the project", Status.NEW, tasks);
-        tasks[0] = new Subtask("Task 1", "Task 1 description", Status.NEW, epic1);
-        tasks[1] = new Subtask("Task 2", "Task 2 description", Status.IN_PROGRESS, epic1);
+        ArrayList<Subtask> subtasks = new ArrayList<>();
+        subtasks.add(new Subtask("Task 1", "Task 1 description", Status.NEW, null));
+        subtasks.add(new Subtask("Task 2", "Task 2 description", Status.IN_PROGRESS, null));
+        Epic epic1 = new Epic("Create a new epic", "Create a new epic for the project", Status.NEW, subtasks);
 
         // create a new epic (with 1 subtask)
-        Subtask[] tasks1 = new Subtask[1];
-        Epic epic2 = new Epic("Create a new epic", "Create a new epic for the project", Status.NEW, tasks1);
-        tasks1[0] = new Subtask("Task 1", "Task 1 description", Status.NEW, epic2);
+        ArrayList<Subtask> subtasks1 = new ArrayList<>();
+        subtasks1.add(new Subtask("Task 1", "Task 1 description", Status.NEW, null));
+        Epic epic2 = new Epic("Create a new epic", "Create a new epic for the project", Status.NEW, subtasks1);
 
         TaskManager taskManager = new TaskManager();
         taskManager.addTask(task1);
