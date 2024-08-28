@@ -1,4 +1,4 @@
-package tasks;
+package model;
 
 import java.util.ArrayList;
 
@@ -14,11 +14,23 @@ public class Epic extends Task {
     }
 
     @Override public String toString() {
-        return super.toString() + " - Subtasks: " + subtasks.size();
+        return super.toString() + " - Subtasks: " + showAllSubtasksIds();
+    }
+
+    private String showAllSubtasksIds() {
+        StringBuilder result = new StringBuilder();
+        for (Subtask subtask : subtasks) {
+            result.append(subtask.getId()).append(", ");
+        }
+        return result.toString();
     }
 
     public ArrayList<Subtask> getSubtasks() {
         return subtasks;
+    }
+
+    public void removeSubtask(Subtask subtask) {
+        subtasks.remove(subtask);
     }
 
     @Override

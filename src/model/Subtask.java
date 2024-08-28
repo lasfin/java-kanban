@@ -1,9 +1,9 @@
-package tasks;
+package model;
 
 public class Subtask extends Task {
-    private Task parentTask;
+    private Epic parentTask;
 
-    public Subtask(String name, String description, Status status, Task parentTask) {
+    public Subtask(String name, String description, Status status, Epic parentTask) {
         super(name, description, status);
         this.parentTask = parentTask;
     }
@@ -13,14 +13,14 @@ public class Subtask extends Task {
             return super.toString() + " - Parent task: null";
         }
 
-        return super.toString() + " - Parent task: " + parentTask.getName();
+        return super.toString() + " - Parent task: " + parentTask.getId() + ": " + parentTask.getName();
     }
 
-    public Task getParentTask() {
+    public Epic getParentTask() {
         return parentTask;
     }
 
-    public void setParentTask(Task parentTask) {
+    public void setParentTask(Epic parentTask) {
         this.parentTask = parentTask;
     }
 }
