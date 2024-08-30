@@ -8,19 +8,16 @@ public class Subtask extends Task {
         this.parentTask = parentTask;
     }
 
-    @Override public String toString() {
-        if (parentTask == null) {
-            return super.toString() + " - Parent task: null";
-        }
-
-        return super.toString() + " - Parent task: " + parentTask.getId() + ": " + parentTask.getName();
-    }
-
     public Epic getParentTask() {
         return parentTask;
     }
 
     public void setParentTask(Epic parentTask) {
         this.parentTask = parentTask;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " - Parent task: " + parentTask.getId() + ": " + parentTask.getName();
     }
 }

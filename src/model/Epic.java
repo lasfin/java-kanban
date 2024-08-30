@@ -3,18 +3,10 @@ package model;
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    private ArrayList<Subtask> subtasks;
+    private final ArrayList<Subtask> subtasks = new ArrayList<>();
 
-    public Epic(String name, String description, Status status, ArrayList<Subtask> subtasks) {
+    public Epic(String name, String description, Status status) {
         super(name, description, status);
-        this.subtasks = subtasks;
-        for (Subtask subtask : subtasks) {
-            subtask.setParentTask(this);
-        }
-    }
-
-    @Override public String toString() {
-        return super.toString() + " - Subtasks: " + showAllSubtasksIds();
     }
 
     private String showAllSubtasksIds() {
@@ -33,15 +25,24 @@ public class Epic extends Task {
         subtasks.remove(subtask);
     }
 
+    public void addSubtask(Subtask subtask) {
+        subtasks.add(subtask);
+        subtask.setParentTask(this);
+    }
+
     @Override
     public Status getStatus() {
         int newCounter = 0;
+        int doneCounter = 0;
         if (subtasks.isEmpty()) {
             return Status.NEW;
         }
         for (Subtask subtask : subtasks) {
             if (subtask.getStatus() == Status.IN_PROGRESS) {
                 return Status.IN_PROGRESS;
+            }
+            if (subtask.getStatus() == Status.DONE) {
+                doneCounter++;
             }
             if (subtask.getStatus() == Status.NEW) {
                 newCounter++;
@@ -52,6 +53,15 @@ public class Epic extends Task {
             return Status.NEW;
         }
 
+        if (doneCounter < subtasks.size()) {
+            return Status.IN_PROGRESS;
+        }
+
         return Status.DONE;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " - Subtasks: " + showAllSubtasksIds();
     }
 }

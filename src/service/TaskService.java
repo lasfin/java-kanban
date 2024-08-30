@@ -8,17 +8,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskService {
-    private HashMap<Integer, Task> tasks;
-    private HashMap<Integer, Epic> epics;
-    private HashMap<Integer, Subtask> subtasks;
+    private final HashMap<Integer, Task> tasks = new HashMap<>();
+    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
     private Integer lastId = 0;
-
-    public TaskService() {
-        tasks = new HashMap<>();
-        epics = new HashMap<>();
-        subtasks = new HashMap<>();
-    }
 
     public HashMap<Integer, Task> getTasks() {
         return tasks;
@@ -100,9 +94,9 @@ public class TaskService {
         }
     }
 
-    public void updateTask(Integer id, Task task) {
-        if (tasks.containsKey(id)) {
-            tasks.put(id, task);
+    public void updateTask(Task task) {
+        if (tasks.containsKey(task.getId())) {
+            tasks.put(task.getId(), task);
         }
     }
 
