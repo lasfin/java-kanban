@@ -6,15 +6,17 @@ public class Epic extends Task {
     private final ArrayList<Subtask> subtasks = new ArrayList<>();
 
     public Epic(String name, String description, Status status) {
-        super(name, description, status);
+        super(name, description, Status.NEW);
     }
 
-    private String showAllSubtasksIds() {
-        StringBuilder result = new StringBuilder();
-        for (Subtask subtask : subtasks) {
-            result.append(subtask.getId()).append(", ");
+    public void replaceSubtask(Subtask subtask) {
+        for (int i = 0; i < subtasks.size(); i++) {
+            if (subtasks.get(i).getId() == subtask.getId()) {
+                subtasks.set(i, subtask);
+                this.setStatus(calculateStatus());
+                return;
+            }
         }
-        return result.toString();
     }
 
     public ArrayList<Subtask> getSubtasks() {
@@ -60,9 +62,12 @@ public class Epic extends Task {
         return Status.DONE;
     }
 
-    @Override
-    public Status getStatus() {
-        return calculateStatus();
+    private String showAllSubtasksIds() {
+        StringBuilder result = new StringBuilder();
+        for (Subtask subtask : subtasks) {
+            result.append(subtask.getId()).append(", ");
+        }
+        return result.toString();
     }
 
     @Override
