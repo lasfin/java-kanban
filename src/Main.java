@@ -7,6 +7,13 @@ import model.Task;
 public class Main {
 
     public static void main(String[] args) {
+        testGeneralFlow();
+        testEpicWithNewAndInProgress();
+        testEpicWithExtraSubtaskAdded();
+        testUpdateSubtask();
+    }
+
+    public static void testGeneralFlow() {
         TaskService taskManager = new TaskService();
         // Create two new tasks
         Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
@@ -14,8 +21,8 @@ public class Main {
 
         // Create a new epic (with 2 subtask)
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
-        epic1.addSubtask(new Subtask("Subtask 1", "Subtask 1 description", Status.NEW, epic1));
-        epic1.addSubtask(new Subtask("Subtask 2", "Subtask 2 description", Status.NEW, epic1));
+        taskManager.addSubtask(new Subtask("Subtask 1", "Subtask 1 description", Status.NEW, epic1));
+        taskManager.addSubtask(new Subtask("Subtask 2", "Subtask 2 description", Status.NEW, epic1));
 
         // create a new epic (with 1 subtask)
         Epic epic2 = new Epic("Epic 2", "Some text", Status.NEW);
@@ -54,15 +61,65 @@ public class Main {
         // удаляем все таски
         taskManager.removeAll();
         printAllTasks(taskManager);
+    }
 
-        testEpicWithNewAndInProgress();
-        testEpicWithExtraSubtaskAdded();
+    public static void testEpicWithNewAndInProgress () {
+        /**
+         * Если одна подзадача в статусе DONE, а остальные NEW, эпик должен быть в статусе IN_PROGRESS
+         */
+        TaskService taskManager = new TaskService();
+
+        Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
+
+        taskManager.addSubtask(new Subtask("Subtask 1", "Subtask 1 description", Status.NEW, epic1));
+        taskManager.addSubtask(new Subtask("Subtask 2", "Subtask 2 description", Status.DONE, epic1));
+        taskManager.addEpic(epic1);
+
+        System.out.println("Epic should have status IN_PROGRESS: " + epic1.getStatus());
+    }
+
+    public static void testEpicWithExtraSubtaskAdded () {
+        /**
+         * При создании подзадачи, ее идентификатор должен быть добавлен в список в эпике,
+         * а также должен быть обновлен статус эпика
+         */
+        TaskService taskManager = new TaskService();
+        Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
+
+        taskManager.addSubtask(new Subtask("Subtask 1", "Subtask 1 description", Status.DONE, epic1));
+        taskManager.addEpic(epic1);
+
+        System.out.println("Epic should have status DONE: " + epic1.getStatus());
+
+        /**
+         * Удаляем подзадачу, статус эпика должен измениться на NEW
+         */
+        taskManager.removeTask(2);
+        System.out.println("Epic should have status NEW: " + epic1.getStatus());
+    }
+
+    public static void testUpdateSubtask() {
+        /**
+         * При обновлении статуса подзадачи, статус эпика должен быть обновлен
+         */
+        TaskService taskManager = new TaskService();
+        Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
+        Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.NEW, epic1);
+
+
+        taskManager.addEpic(epic1);
+        taskManager.addSubtask(subtask1);
+        subtask1.setStatus(Status.IN_PROGRESS);
+        taskManager.updateSubtask(subtask1);
+
+        System.out.println("Epic should have status TASK IN_PROGRESS: " + taskManager.getEpic(1).getStatus());
+        System.out.println("Subtask should have status IN_PROGRESS: " + taskManager.getSubtask(2).getStatus());
     }
 
     public static void printAllTasks(TaskService taskManager) {
         if (taskManager.getTasks().isEmpty() &&
-            taskManager.getEpics().isEmpty() &&
-            taskManager.getSubtasks().isEmpty()) {
+                taskManager.getEpics().isEmpty() &&
+                taskManager.getSubtasks().isEmpty()) {
             System.out.println("No tasks found.");
             return;
         }
@@ -81,41 +138,4 @@ public class Main {
         }
         System.out.println();
     }
-
-    public static void testEpicWithNewAndInProgress () {
-        /**
-         * Если одна подзадача в статусе DONE, а остальные NEW, эпик должен быть в статусе IN_PROGRESS
-         */
-        TaskService taskManager = new TaskService();
-
-        Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
-        epic1.addSubtask(new Subtask("Subtask 1", "Subtask 1 description", Status.NEW, epic1));
-        epic1.addSubtask(new Subtask("Subtask 2", "Subtask 2 description", Status.DONE, epic1));
-
-        taskManager.addEpic(epic1);
-
-        System.out.println("Epic should have status IN_PROGRESS: " + epic1.getStatus());
-    }
-
-    public static void testEpicWithExtraSubtaskAdded () {
-        /**
-         * При создании подзадачи, ее идентификатор должен быть добавлен в список в эпике,
-         * а также должен быть обновлен статус эпика
-         */
-        TaskService taskManager = new TaskService();
-        Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
-
-        epic1.addSubtask(new Subtask("Subtask 1", "Subtask 1 description", Status.DONE, epic1));
-        taskManager.addEpic(epic1);
-
-        System.out.println("Epic should have status DONE: " + epic1.getStatus());
-
-        /**
-         * Удаляем подзадачу, статус эпика должен измениться на NEW
-         */
-        taskManager.removeTask(2);
-        System.out.println("Epic should have status NEW: " + epic1.getStatus());
-    }
 }
-
-// todo: вынести addSubtask в taskService

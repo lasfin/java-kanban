@@ -52,6 +52,8 @@ public class TaskService {
         subtask.setId(newId);
 
         subtasks.put(newId, subtask);
+        Epic epic = subtask.getParentTask();
+        epic.addSubtask(subtask);
     }
 
     public void removeTask(Integer id) {
@@ -82,15 +84,17 @@ public class TaskService {
     }
 
 
-    public void updateSubtask(Integer id, Subtask subtask) {
-        if (subtasks.containsKey(id)) {
-            subtasks.put(id, subtask);
+    public void updateSubtask(Subtask subtask) {
+        if (subtasks.containsKey(subtask.getId())) {
+            subtasks.put(subtask.getId(), subtask);
         }
+        Epic epic = subtask.getParentTask();
+        epic.setStatus(epic.calculateStatus());
     }
 
-    public void updateEpic(Integer id, Epic epic) {
-        if (epics.containsKey(id)) {
-            epics.put(id, epic);
+    public void updateEpic(Epic epic) {
+        if (epics.containsKey(epic.getId())) {
+            epics.put(epic.getId(), epic);
         }
     }
 

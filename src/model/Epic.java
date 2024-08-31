@@ -23,15 +23,15 @@ public class Epic extends Task {
 
     public void removeSubtask(Subtask subtask) {
         subtasks.remove(subtask);
+        this.setStatus(calculateStatus());
     }
 
     public void addSubtask(Subtask subtask) {
         subtasks.add(subtask);
-        subtask.setParentTask(this);
+        this.setStatus(calculateStatus());
     }
 
-    @Override
-    public Status getStatus() {
+    public Status calculateStatus() {
         int newCounter = 0;
         int doneCounter = 0;
         if (subtasks.isEmpty()) {
@@ -58,6 +58,11 @@ public class Epic extends Task {
         }
 
         return Status.DONE;
+    }
+
+    @Override
+    public Status getStatus() {
+        return calculateStatus();
     }
 
     @Override
