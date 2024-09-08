@@ -1,4 +1,4 @@
-import service.TaskService;
+import service.InMemoryTaskService;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -14,7 +14,7 @@ public class Main {
     }
 
     public static void testGeneralFlow() {
-        TaskService taskManager = new TaskService();
+        InMemoryTaskService taskManager = new InMemoryTaskService();
         // Create two new tasks
         Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
         Task task2 = new Task("Create a second task", "Create a second task for the project", Status.NEW);
@@ -71,7 +71,7 @@ public class Main {
         /**
          * Если одна подзадача в статусе DONE, а остальные NEW, эпик должен быть в статусе IN_PROGRESS
          */
-        TaskService taskManager = new TaskService();
+        InMemoryTaskService taskManager = new InMemoryTaskService();
 
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
 
@@ -87,7 +87,7 @@ public class Main {
          * При создании подзадачи, ее идентификатор должен быть добавлен в список в эпике,
          * а также должен быть обновлен статус эпика
          */
-        TaskService taskManager = new TaskService();
+        InMemoryTaskService taskManager = new InMemoryTaskService();
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         Subtask subtask = new Subtask("Subtask 1", "Subtask 1 description", Status.DONE, epic1);
         taskManager.addSubtask(subtask);
@@ -106,7 +106,7 @@ public class Main {
         /**
          * При обновлении статуса подзадачи, статус эпика должен быть обновлен
          */
-        TaskService taskManager = new TaskService();
+        InMemoryTaskService taskManager = new InMemoryTaskService();
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.NEW, epic1);
 
@@ -120,7 +120,7 @@ public class Main {
         System.out.println("Subtask should have status IN_PROGRESS: " + taskManager.getSubtask(2).getStatus());
     }
 
-    public static void printAllTasks(TaskService taskManager) {
+    public static void printAllTasks(InMemoryTaskService taskManager) {
         if (taskManager.getTasks().isEmpty() &&
                 taskManager.getEpics().isEmpty() &&
                 taskManager.getSubtasks().isEmpty()) {
