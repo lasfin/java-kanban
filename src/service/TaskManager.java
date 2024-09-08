@@ -30,5 +30,10 @@ public interface TaskManager {
 
     public void removeAll();
 
-
+    /**
+     * Метод должен возвращать последние 10 просмотренных задач.
+     * Просмотром будем считать вызов тех методов, которые получают задачу по идентификатору, —
+     * getTask(int id), getSubtask(int id) и getEpic(int id). От повторных просмотров избавляться не нужно.
+     */
+    public ArrayList<Task> getLastTasks();
 }

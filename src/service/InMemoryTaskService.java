@@ -12,6 +12,9 @@ public class InMemoryTaskService implements TaskManager {
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
+    private int lastTasksCap = 10;
+    private final ArrayList<Task> lastTasks = new ArrayList<>();
+
     private Integer lastId = 0;
 
     @Override
@@ -92,19 +95,32 @@ public class InMemoryTaskService implements TaskManager {
         tasks.put(task.getId(), task);
     }
 
+    private void markTaskAsLast(Task task) {
+        if (lastTasks.size() == lastTasksCap) {
+            lastTasks.removeFirst();
+        }
+        lastTasks.add(task);
+    }
+
     @Override
     public Task getTask(int id) {
-        return tasks.get(id);
+        Task task = tasks.get(id);
+        markTaskAsLast(task);
+        return task;
     }
 
     @Override
     public Epic getEpic(int id) {
-        return epics.get(id);
+        Epic epic = epics.get(id);
+        markTaskAsLast(epic);
+        return epic;
     }
 
     @Override
     public Subtask getSubtask(int id) {
-        return subtasks.get(id);
+        Subtask subtask = subtasks.get(id);
+        markTaskAsLast(subtask);
+        return subtask;
     }
 
     public ArrayList<Subtask> getEpicTasks(int id) {
@@ -121,5 +137,10 @@ public class InMemoryTaskService implements TaskManager {
         tasks.clear();
         epics.clear();
         subtasks.clear();
+    }
+
+    @Override
+    public ArrayList<Task> getLastTasks() {
+        return new ArrayList<>();
     }
 }
