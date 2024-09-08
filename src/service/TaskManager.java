@@ -5,6 +5,7 @@ import model.Subtask;
 import model.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
     public ArrayList<Task> getTasks();
@@ -35,5 +36,5 @@ public interface TaskManager {
      * Просмотром будем считать вызов тех методов, которые получают задачу по идентификатору, —
      * getTask(int id), getSubtask(int id) и getEpic(int id). От повторных просмотров избавляться не нужно.
      */
-    public ArrayList<Task> getHistory();
+    public List<Task> getHistory();
 }

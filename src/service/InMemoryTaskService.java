@@ -6,6 +6,7 @@ import model.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryTaskService implements TaskManager {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
@@ -13,7 +14,7 @@ public class InMemoryTaskService implements TaskManager {
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
     private int lastTasksCap = 10;
-    private final ArrayList<Task> lastTasks = new ArrayList<>();
+    private List<Task> lastTasks = List.of();
 
     private Integer lastId = 0;
 
@@ -140,7 +141,7 @@ public class InMemoryTaskService implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
-        return new ArrayList<>();
+    public List<Task> getHistory() {
+        return lastTasks;
     }
 }
