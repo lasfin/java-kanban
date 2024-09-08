@@ -140,7 +140,7 @@ public class InMemoryTaskService implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getLastTasks() {
+    public ArrayList<Task> getHistory() {
         return new ArrayList<>();
     }
 }
