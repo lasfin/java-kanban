@@ -1,4 +1,6 @@
 import service.InMemoryTaskService;
+import service.TaskServiceManager;
+import service.TaskService;
 import model.Epic;
 import model.Status;
 import model.Subtask;
@@ -14,7 +16,7 @@ public class Main {
     }
 
     public static void testGeneralFlow() {
-        InMemoryTaskService taskManager = new InMemoryTaskService();
+        TaskService taskManager = TaskServiceManager.getDefault();
         // Create two new tasks
         Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
         Task task2 = new Task("Create a second task", "Create a second task for the project", Status.NEW);
@@ -120,7 +122,7 @@ public class Main {
         System.out.println("Subtask should have status IN_PROGRESS: " + taskManager.getSubtask(2).getStatus());
     }
 
-    public static void printAllTasks(InMemoryTaskService taskManager) {
+    public static void printAllTasks(TaskService taskManager) {
         if (taskManager.getTasks().isEmpty() &&
                 taskManager.getEpics().isEmpty() &&
                 taskManager.getSubtasks().isEmpty()) {

@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class InMemoryTaskService implements TaskManager {
+public class InMemoryTaskService implements TaskService {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
     private int lastTasksCap = 10;
-    private List<Task> lastTasks = List.of();
+    private ArrayList<Task> lastTasks = new ArrayList<>();
 
     private Integer lastId = 0;
 
@@ -100,6 +100,7 @@ public class InMemoryTaskService implements TaskManager {
         if (lastTasks.size() == lastTasksCap) {
             lastTasks.removeFirst();
         }
+
         lastTasks.add(task);
     }
 
