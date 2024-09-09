@@ -12,9 +12,7 @@ public class InMemoryTaskService implements TaskService {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-
-    private int lastTasksCap = 10;
-    private ArrayList<Task> lastTasks = new ArrayList<>();
+    private final HistoryManager historyManager = new InMemoryHistoryHistoryManager();
 
     private Integer lastId = 0;
 
@@ -97,11 +95,7 @@ public class InMemoryTaskService implements TaskService {
     }
 
     private void markTaskAsLast(Task task) {
-        if (lastTasks.size() == lastTasksCap) {
-            lastTasks.removeFirst();
-        }
-
-        lastTasks.add(task);
+        historyManager.add(task);
     }
 
     @Override
@@ -143,6 +137,6 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public List<Task> getHistory() {
-        return lastTasks;
+        return historyManager.getHistory();
     }
 }
