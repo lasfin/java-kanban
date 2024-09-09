@@ -1,4 +1,4 @@
-package service;
+package main.service;
 
 public class TaskServiceManager {
     public static TaskService getDefault() {
