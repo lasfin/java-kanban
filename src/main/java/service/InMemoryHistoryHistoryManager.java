@@ -1,6 +1,6 @@
-package main.service;
+package service;
 
-import main.model.Task;
+import model.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ public class InMemoryHistoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         int lastTasksCap = 10;
         if (history.size() == lastTasksCap) {
-            history.removeFirst();
+            history.remove(0);
         }
         history.add(task);
     }

@@ -1,12 +1,10 @@
-package main;
-
-import main.service.InMemoryTaskService;
-import main.service.TaskServiceManager;
-import main.service.TaskService;
-import main.model.Epic;
-import main.model.Status;
-import main.model.Subtask;
-import main.model.Task;
+import service.InMemoryTaskService;
+import service.TaskServiceManager;
+import service.TaskService;
+import model.Epic;
+import model.Status;
+import model.Subtask;
+import model.Task;
 
 public class Main {
 
