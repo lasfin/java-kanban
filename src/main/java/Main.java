@@ -1,6 +1,6 @@
-import service.InMemoryTaskService;
-import service.TaskServiceManager;
-import service.TaskService;
+import services.task.InMemoryTaskService;
+import services.task.TaskServiceManager;
+import services.task.TaskService;
 import model.Epic;
 import model.Status;
 import model.Subtask;

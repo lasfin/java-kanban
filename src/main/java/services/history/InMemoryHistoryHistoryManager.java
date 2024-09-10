@@ -1,4 +1,4 @@
-package service;
+package services.history;
 
 import model.Task;
 
@@ -11,7 +11,7 @@ public class InMemoryHistoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         int lastTasksCap = 10;
         if (history.size() == lastTasksCap) {
-            history.removeFirst();
+            history.remove(0);
         }
         history.add(task);
     }

@@ -1,8 +1,10 @@
-package service;
+package services.task;
 
 import model.Epic;
 import model.Subtask;
 import model.Task;
+import services.history.HistoryManager;
+import services.history.InMemoryHistoryHistoryManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
