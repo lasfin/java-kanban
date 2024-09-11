@@ -14,7 +14,7 @@ public class InMemoryTaskService implements TaskService {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private final HistoryManager historyManager = new InMemoryHistoryHistoryManager();
+    private final HistoryManager historyManager = new InMemoryHistoryHistoryManager(10);
 
     private Integer lastId = 0;
 
