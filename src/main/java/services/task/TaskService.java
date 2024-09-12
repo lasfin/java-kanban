@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface TaskService {
     public ArrayList<Task> getTasks();
+
     public ArrayList<Epic> getEpics();
+
     public ArrayList<Subtask> getSubtasks();
 
     public void addTask(Task task);
