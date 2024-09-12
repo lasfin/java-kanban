@@ -53,7 +53,8 @@ public class TaskServiceManagerTest {
         assertEquals(epic1.getStatus(), Status.IN_PROGRESS);
     }
 
-    @Test void epicShouldChangeStatusWhenSubtaskDeleted() {
+    @Test
+    void epicShouldChangeStatusWhenSubtaskDeleted() {
         TaskService taskService = TaskServiceManager.getDefault();
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.IN_PROGRESS, epic1);
@@ -67,7 +68,8 @@ public class TaskServiceManagerTest {
     }
 
 
-    @Test void allSubtasksTasksShouldBeDeletedWhenEpicDeleted() {
+    @Test
+    void allSubtasksTasksShouldBeDeletedWhenEpicDeleted() {
         TaskService taskService = TaskServiceManager.getDefault();
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.IN_PROGRESS, epic1);
@@ -83,7 +85,8 @@ public class TaskServiceManagerTest {
         assertEquals(taskService.getSubtasks().size(), 0);
     }
 
-    @Test void allTasksDeletedAfterDeleteAllCalled() {
+    @Test
+    void allTasksDeletedAfterDeleteAllCalled() {
         TaskService taskService = TaskServiceManager.getDefault();
         Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
@@ -99,7 +102,8 @@ public class TaskServiceManagerTest {
         assertEquals(taskService.getSubtasks().size(), 0);
     }
 
-    @Test void testEpicWithNewAndInProgress() {
+    @Test
+    void testEpicWithNewAndInProgress() {
         TaskService taskService = TaskServiceManager.getDefault();
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.IN_PROGRESS, epic1);
@@ -112,7 +116,8 @@ public class TaskServiceManagerTest {
         assertEquals(epic1.getStatus(), Status.IN_PROGRESS);
     }
 
-    @Test void testEpicWithDoneAndNew() {
+    @Test
+    void testEpicWithDoneAndNew() {
         TaskService taskService = TaskServiceManager.getDefault();
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.DONE, epic1);

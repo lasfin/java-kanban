@@ -5,22 +5,20 @@ import model.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InMemoryHistoryHistoryManager implements HistoryManager {
+public class InMemoryHistoryManager implements HistoryManager {
     private final List<Task> history = new ArrayList<>();
-    private final int lastTasksCap;
+    private final static int LAST_TASKS_CAP = 10;
 
-    public InMemoryHistoryHistoryManager(int lastTasksCap) {
-        this.lastTasksCap = lastTasksCap;
-    }
-
+    @Override
     public void add(Task task) {
-        if (history.size() == lastTasksCap) {
+        if (history.size() == LAST_TASKS_CAP) {
             history.remove(0);
         }
         history.add(task);
     }
 
+    @Override
     public List<Task> getHistory() {
-        return history;
+        return new ArrayList<>(history);
     }
 }

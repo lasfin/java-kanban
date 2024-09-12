@@ -39,6 +39,9 @@ public class Main {
 
         int idSecondEpic = epic2.getId();
 
+        taskManager.getEpic(idSecondEpic);
+        System.out.println("History of views (should be one epic here): " + taskManager.getHistory());
+
         System.out.println("Old epic status should be NEW: " + taskManager.getEpic(idSecondEpic).getStatus());
 
         subtask3.setStatus(Status.IN_PROGRESS);
@@ -53,6 +56,9 @@ public class Main {
 
         taskManager.removeEpic(epic2);
         printAllTasks(taskManager);
+
+        taskManager.getEpic(idSecondEpic);
+        taskManager.getTask(task1.getId());
 
         taskManager.removeAll();
 
