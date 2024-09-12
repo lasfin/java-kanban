@@ -9,6 +9,7 @@ public class Managers {
     public static TaskService getDefault() {
         return new InMemoryTaskService();
     }
+
     public static HistoryService getDefaultHistoryService() {
         return new InMemoryHistoryService();
     }
