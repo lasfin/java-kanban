@@ -3,8 +3,8 @@ package services.task;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import services.history.HistoryManager;
-import services.history.InMemoryHistoryManager;
+import services.history.HistoryService;
+import services.history.InMemoryHistoryService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ public class InMemoryTaskService implements TaskService {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private final HistoryManager historyManager = new InMemoryHistoryManager();
+    private final HistoryService historyManager = new InMemoryHistoryService();
 
     private Integer lastId = 0;
 
