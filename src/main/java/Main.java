@@ -1,5 +1,4 @@
-import services.task.InMemoryTaskService;
-import services.task.TaskServiceManager;
+import services.Managers;
 import services.task.TaskService;
 import model.Epic;
 import model.Status;
@@ -13,7 +12,7 @@ public class Main {
     }
 
     public static void runGeneralFlow() {
-        TaskService taskManager = TaskServiceManager.getDefault();
+        TaskService taskManager = Managers.getDefault();
         // Create two new tasks
         Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
         Task task2 = new Task("Create a second task", "Create a second task for the project", Status.NEW);
