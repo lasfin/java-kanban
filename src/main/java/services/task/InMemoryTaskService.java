@@ -3,8 +3,8 @@ package services.task;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import services.history.HistoryManager;
-import services.history.InMemoryHistoryHistoryManager;
+import services.Managers;
+import services.history.HistoryService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +14,7 @@ public class InMemoryTaskService implements TaskService {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private final HistoryManager historyManager = new InMemoryHistoryHistoryManager(10);
+    private final HistoryService historyService = Managers.getDefaultHistoryService();
 
     private Integer lastId = 0;
 
@@ -97,7 +97,9 @@ public class InMemoryTaskService implements TaskService {
     }
 
     private void markTaskAsLast(Task task) {
-        historyManager.add(task);
+        if (task != null) {
+            historyService.add(task);
+        }
     }
 
     @Override
@@ -121,15 +123,6 @@ public class InMemoryTaskService implements TaskService {
         return subtask;
     }
 
-    public ArrayList<Subtask> getEpicTasks(int id) {
-        if (epics.containsKey(id)) {
-            Epic epic = epics.get(id);
-            return epic.getSubtasks();
-        }
-
-        return new ArrayList<>();
-    }
-
     @Override
     public void removeAll() {
         tasks.clear();
@@ -139,6 +132,6 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public List<Task> getHistory() {
-        return historyManager.getHistory();
+        return historyService.getHistory();
     }
 }

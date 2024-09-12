@@ -1,5 +1,4 @@
-import services.task.InMemoryTaskService;
-import services.task.TaskServiceManager;
+import services.Managers;
 import services.task.TaskService;
 import model.Epic;
 import model.Status;
@@ -13,7 +12,7 @@ public class Main {
     }
 
     public static void runGeneralFlow() {
-        TaskService taskManager = TaskServiceManager.getDefault();
+        TaskService taskManager = Managers.getDefault();
         // Create two new tasks
         Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
         Task task2 = new Task("Create a second task", "Create a second task for the project", Status.NEW);
@@ -39,6 +38,9 @@ public class Main {
 
         int idSecondEpic = epic2.getId();
 
+        taskManager.getEpic(idSecondEpic);
+        System.out.println("History of views (should be one epic here): " + taskManager.getHistory());
+
         System.out.println("Old epic status should be NEW: " + taskManager.getEpic(idSecondEpic).getStatus());
 
         subtask3.setStatus(Status.IN_PROGRESS);
@@ -53,6 +55,9 @@ public class Main {
 
         taskManager.removeEpic(epic2);
         printAllTasks(taskManager);
+
+        taskManager.getEpic(idSecondEpic);
+        taskManager.getTask(task1.getId());
 
         taskManager.removeAll();
 
