@@ -8,37 +8,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskService {
-    public ArrayList<Task> getTasks();
+     ArrayList<Task> getTasks();
 
-    public ArrayList<Epic> getEpics();
+     ArrayList<Epic> getEpics();
 
-    public ArrayList<Subtask> getSubtasks();
+     ArrayList<Subtask> getSubtasks();
 
-    public void addTask(Task task);
+     void addTask(Task task);
 
-    public void removeTask(Task task);
+     void removeTask(Task task);
 
-    public void addEpic(Epic epic);
+     void addEpic(Epic epic);
 
-    public void removeEpic(Epic epic);
+     void removeEpic(Epic epic);
 
-    public void addSubtask(Subtask subtask);
+     void addSubtask(Subtask subtask);
 
-    public void removeSubtask(Subtask subtask);
+     void removeSubtask(Subtask subtask);
 
-    public Task getTask(int id);
+     Task getTask(int id);
 
-    public Epic getEpic(int id);
+     Epic getEpic(int id);
 
-    public Subtask getSubtask(int id);
+     Subtask getSubtask(int id);
 
-    public void updateSubtask(Subtask subtask);
+     void updateSubtask(Subtask subtask);
 
-    public void updateTask(Task task);
+     void updateTask(Task task);
 
-    public void updateEpic(Epic epic);
+     void updateEpic(Epic epic);
 
-    public void removeAll();
+     void removeAll();
 
-    public List<Task> getHistory();
+     List<Task> getHistory();
 }

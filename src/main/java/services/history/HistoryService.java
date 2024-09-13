@@ -5,7 +5,7 @@ import model.Task;
 import java.util.List;
 
 public interface HistoryService {
-    public void add(Task task);
+    void add(Task task);
 
-    public List<Task> getHistory();
+    List<Task> getHistory();
 }
