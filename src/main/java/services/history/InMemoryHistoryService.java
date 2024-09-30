@@ -18,6 +18,11 @@ public class InMemoryHistoryService implements HistoryService {
     }
 
     @Override
+    public void remove(int id) {
+        history.removeIf(task -> task.getId() == id);
+    }
+
+    @Override
     public List<Task> getHistory() {
         return new ArrayList<>(history);
     }

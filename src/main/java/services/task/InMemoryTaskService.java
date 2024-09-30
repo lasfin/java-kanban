@@ -61,13 +61,16 @@ public class InMemoryTaskService implements TaskService {
     @Override
     public void removeTask(Task task) {
         tasks.remove(task.getId());
+        historyService.remove(task.getId());
     }
 
     @Override
     public void removeSubtask(Subtask subtask) {
         Epic epic = subtask.getParentTask();
         epic.removeSubtask(subtask);
+
         subtasks.remove(subtask.getId());
+        historyService.remove(subtask.getId());
     }
 
     @Override
@@ -75,8 +78,11 @@ public class InMemoryTaskService implements TaskService {
         ArrayList<Subtask> epicSubtasks = epic.getSubtasks();
         for (Subtask subtask : epicSubtasks) {
             subtasks.remove(subtask.getId());
+            historyService.remove(subtask.getId());
         }
+
         epics.remove(epic.getId());
+        historyService.remove(epic.getId());
     }
 
     @Override
