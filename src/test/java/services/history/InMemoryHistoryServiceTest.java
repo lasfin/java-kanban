@@ -20,7 +20,9 @@ public class InMemoryHistoryServiceTest {
     public void shouldRemoveTaskFromHistory() {
         InMemoryHistoryService historyService = new InMemoryHistoryService();
         Task task = new Task("test", "test", Status.NEW);
+        task.setId(1);
         Epic epic = new Epic("test", "test", Status.NEW);
+        epic.setId(2);
 
         historyService.add(task);
         historyService.add(epic);
@@ -39,8 +41,9 @@ public class InMemoryHistoryServiceTest {
     public void shouldBeAbleStoreManyTasksInHistory() {
         InMemoryHistoryService historyService = new InMemoryHistoryService();
 
-        Task task = new Task("test", "test", Status.NEW);
-        for (int i = 0; i <= 10 + 2; i++) {
+        for (int i = 0; i < 13; i++) {
+            Task task = new Task("test", "test", Status.NEW);
+            task.setId(i);
             historyService.add(task);
         }
 
@@ -50,6 +53,19 @@ public class InMemoryHistoryServiceTest {
     @Test
     public void shouldReturnEmptyHistory() {
         InMemoryHistoryService historyService = new InMemoryHistoryService();
+
         Assertions.assertTrue(historyService.getHistory().isEmpty());
+    }
+
+    @Test
+    public void shouldReplaceSameTask() {
+        InMemoryHistoryService historyService = new InMemoryHistoryService();
+        Task task = new Task("test", "test", Status.NEW);
+        task.setId(1);
+        historyService.add(task);
+        task.setStatus(Status.IN_PROGRESS);
+        historyService.add(task);
+
+        Assertions.assertEquals(1, historyService.getHistory().size());
     }
 }
