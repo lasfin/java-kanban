@@ -13,6 +13,7 @@ public class InMemoryHistoryService implements HistoryService {
         Task task;
         Node prev;
         Node next;
+
         public Node(Task task) {
             this.task = task;
             this.prev = null;
