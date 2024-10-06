@@ -4,23 +4,28 @@ import model.Epic;
 import model.Status;
 import model.Task;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class InMemoryHistoryServiceTest {
+    InMemoryHistoryService historyService;
+    Task task;
+
+    @BeforeEach
+    public void setUp() {
+        historyService = new InMemoryHistoryService();
+        task = new Task("test", "test", Status.NEW);
+        task.setId(1);
+        historyService.add(task);
+    }
+
     @Test
     public void shouldAddTaskToHistory() {
-        InMemoryHistoryService historyService = new InMemoryHistoryService();
-        Task task = new Task("test", "test", Status.NEW);
-        historyService.add(task);
-
         Assertions.assertTrue(historyService.getHistory().contains(task));
     }
 
     @Test
     public void shouldRemoveTaskFromHistory() {
-        InMemoryHistoryService historyService = new InMemoryHistoryService();
-        Task task = new Task("test", "test", Status.NEW);
-        task.setId(1);
         Epic epic = new Epic("test", "test", Status.NEW);
         epic.setId(2);
 
@@ -39,8 +44,6 @@ public class InMemoryHistoryServiceTest {
 
     @Test
     public void shouldBeAbleStoreManyTasksInHistory() {
-        InMemoryHistoryService historyService = new InMemoryHistoryService();
-
         for (int i = 0; i < 13; i++) {
             Task task = new Task("test", "test", Status.NEW);
             task.setId(i);
@@ -59,10 +62,6 @@ public class InMemoryHistoryServiceTest {
 
     @Test
     public void shouldReplaceSameTask() {
-        InMemoryHistoryService historyService = new InMemoryHistoryService();
-        Task task = new Task("test", "test", Status.NEW);
-        task.setId(1);
-        historyService.add(task);
         task.setStatus(Status.IN_PROGRESS);
         historyService.add(task);
 
