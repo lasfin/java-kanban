@@ -1,6 +1,5 @@
 package services.history;
 
-import model.Node;
 import model.Task;
 
 import java.util.ArrayList;
@@ -9,6 +8,18 @@ import java.util.List;
 
 public class InMemoryHistoryService implements HistoryService {
     private final HashMap<Integer, Node> history = new HashMap<>();
+
+    private static class Node {
+        Task task;
+        Node prev;
+        Node next;
+        public Node(Task task) {
+            this.task = task;
+            this.prev = null;
+            this.next = null;
+        }
+    }
+
     private Node head;
     private Node tail;
 
