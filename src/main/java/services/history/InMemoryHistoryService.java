@@ -71,6 +71,7 @@ public class InMemoryHistoryService implements HistoryService {
             return;
         }
 
+        history.remove(id);
         removeNode(nodeToRemove);
     }
 
