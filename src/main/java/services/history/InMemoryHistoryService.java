@@ -1,6 +1,7 @@
 package services.history;
 
 import model.Task;
+import model.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,54 +10,37 @@ import java.util.List;
 public class InMemoryHistoryService implements HistoryService {
     private final HashMap<Integer, Node> history = new HashMap<>();
 
-    private static class Node {
-        Task task;
-        Node prev;
-        Node next;
-
-        public Node(Task task) {
-            this.task = task;
-            this.prev = null;
-            this.next = null;
-        }
-    }
-
     private Node head;
     private Node tail;
 
     private void linkLast(Task task) {
         final Node oldTail = tail;
-        final Node newNode = new Node(task);
+        final Node newNode = new Node(oldTail, task, null);
         tail = newNode;
-
         if (oldTail == null) {
             head = newNode;
         } else {
-            oldTail.next = newNode;
-            newNode.prev = oldTail;
+            oldTail.setNext(newNode);
         }
-
         history.put(task.getId(), newNode);
     }
 
     public void removeNode(Node node) {
-        final Node next = node.next;
-        final Node prev = node.prev;
-        node.task = null;
-
-        if (head == node && tail == node) {
-            head = null;
-            tail = null;
-        } else if (head == node) {
+        Node next = node.getNext();
+        Node prev = node.getPrev();
+        if (prev == null) {
             head = next;
-            head.prev = null;
-        } else if (tail == node) {
-            tail = prev;
-            tail.next = null;
         } else {
-            prev.next = next;
-            next.prev = prev;
+            prev.setNext(next);
+            node.setNext(null);
         }
+        if (next == null) {
+            tail = prev;
+        } else {
+            next.setPrev(prev);
+            node.setNext(null);
+        }
+        node.setTask(null);
     }
 
     @Override
@@ -82,8 +66,8 @@ public class InMemoryHistoryService implements HistoryService {
 
         Node current = head;
         while (current != null) {
-            tasks.add(current.task);
-            current = current.next;
+            tasks.add(current.getTask());
+            current = current.getNext();
         }
 
         return tasks;
