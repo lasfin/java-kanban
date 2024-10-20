@@ -52,9 +52,10 @@ public class InMemoryTaskService implements TaskService {
     public void addSubtask(Subtask subtask) {
         lastId++;
         subtask.setId(lastId);
-
         subtasks.put(lastId, subtask);
-        Epic epic = subtask.getParentTask();
+
+        int parentTaskId = subtask.getParentTaskId();
+        Epic epic = epics.get(parentTaskId);
         epic.addSubtask(subtask);
     }
 
@@ -66,7 +67,8 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public void removeSubtask(Subtask subtask) {
-        Epic epic = subtask.getParentTask();
+        int parentTaskId = subtask.getParentTaskId();
+        Epic epic = epics.get(parentTaskId);
         epic.removeSubtask(subtask);
 
         subtasks.remove(subtask.getId());
@@ -87,8 +89,9 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public void updateSubtask(Subtask subtask) {
+        int parentTaskId = subtask.getParentTaskId();
+        Epic epic = epics.get(parentTaskId);
         subtasks.put(subtask.getId(), subtask);
-        Epic epic = subtask.getParentTask();
         epic.replaceSubtask(subtask);
     }
 

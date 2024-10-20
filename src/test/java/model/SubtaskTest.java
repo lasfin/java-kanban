@@ -8,9 +8,9 @@ public class SubtaskTest {
     @Test
     void subtasksWithSameIdsAreEqual() {
         Epic epic = new Epic("Test 1", "Test description", Status.NEW);
-        Subtask subtask = new Subtask("Test 1", "Test description", Status.NEW, epic);
+        Subtask subtask = new Subtask("Test 1", "Test description", Status.NEW, epic.getId());
         subtask.setId(1);
-        Subtask subtask2 = new Subtask("Test 2", "Test description", Status.NEW, epic);
+        Subtask subtask2 = new Subtask("Test 2", "Test description", Status.NEW, epic.getId());
         subtask2.setId(1);
         assertEquals(subtask, subtask2);
     }
