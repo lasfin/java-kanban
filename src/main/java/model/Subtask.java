@@ -1,23 +1,32 @@
 package model;
 
 public class Subtask extends Task {
-    private Epic parentTask;
+    private int parentTaskId;
 
-    public Subtask(String name, String description, Status status, Epic parentTask) {
+    public Subtask(String name, String description, Status status, int parentTaskId) {
         super(name, description, status);
-        this.parentTask = parentTask;
+        this.parentTaskId = parentTaskId;
     }
 
-    public Epic getParentTask() {
-        return parentTask;
+    public int getParentTaskId() {
+        return parentTaskId;
     }
 
-    public void setParentTask(Epic parentTask) {
-        this.parentTask = parentTask;
+    public void setParentTaskId(Epic parentTask) {
+        this.parentTaskId = parentTask.getId();
+    }
+
+    public void setParentTaskId(int parentTaskId) {
+        this.parentTaskId = parentTaskId;
     }
 
     @Override
     public String toString() {
-        return super.toString() + " - Parent task: " + parentTask.getId() + ": " + parentTask.getName();
+        return super.toString() + " - Parent task: " + parentTaskId;
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
     }
 }

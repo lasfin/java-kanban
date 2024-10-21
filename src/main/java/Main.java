@@ -18,11 +18,11 @@ public class Main {
         Task task2 = new Task("Create a second task", "Create a second task for the project", Status.NEW);
         // Create a new epic (with 2 subtask)
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
-        Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.NEW, epic1);
-        Subtask subtask2 = new Subtask("Subtask 2", "Subtask 2 description", Status.NEW, epic1);
+        Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.NEW, epic1.getId());
+        Subtask subtask2 = new Subtask("Subtask 2", "Subtask 2 description", Status.NEW, epic1.getId());
         // create a new epic (with 1 subtask)
         Epic epic2 = new Epic("Epic 2", "Some text", Status.NEW);
-        Subtask subtask3 = new Subtask("Subtask 3", "Subtask 3 description", Status.NEW, epic2);
+        Subtask subtask3 = new Subtask("Subtask 3", "Subtask 3 description", Status.NEW, epic2.getId());
 
         taskManager.addTask(task1);
         taskManager.addTask(task2);
