@@ -29,10 +29,13 @@ public class FileBackedTaskService extends InMemoryTaskService {
         loadOrNotify(filePath);
     }
 
+    public static FileBackedTaskService loadFromFile(File file) {
+        return new FileBackedTaskService(file);
+    }
 
     private void loadOrNotify(Path filePath) {
         if (Files.exists(filePath)) {
-            System.out.println("Файл найден, загружаем данные.");
+            System.out.println("Файл найден, загружаем данные." + filePath);
             loadFromFile(filePath);
         } else {
             System.out.println("Файл не найден");
@@ -45,6 +48,7 @@ public class FileBackedTaskService extends InMemoryTaskService {
 
             while ((line = reader.readLine()) != null) {
                 Task task = fromString(line);
+                System.out.println("Loaded task: " + task);
 
                 if (task instanceof Epic) {
                     addEpic((Epic) task);
