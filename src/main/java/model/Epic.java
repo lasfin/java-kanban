@@ -74,4 +74,9 @@ public class Epic extends Task {
     public String toString() {
         return super.toString() + " - Subtasks: " + showAllSubtasksIds();
     }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
 }

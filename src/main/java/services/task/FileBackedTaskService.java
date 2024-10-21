@@ -1,9 +1,7 @@
 package services.task;
 
-import model.Epic;
-import model.Status;
-import model.Subtask;
-import model.Task;
+import model.*;
+import services.exeptions.TasksServiceSaveException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +13,7 @@ import java.util.List;
 
 
 public class FileBackedTaskService extends InMemoryTaskService {
-    Path filePath;
+    private Path filePath;
 
     public FileBackedTaskService() {
         super();
@@ -57,7 +55,7 @@ public class FileBackedTaskService extends InMemoryTaskService {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Произошла ошибка во время чтения файла.");
+            throw new TasksServiceSaveException("Can't read from a file: " + e.getMessage());
         }
 
     }
@@ -74,29 +72,30 @@ public class FileBackedTaskService extends InMemoryTaskService {
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Произошла ошибка во время записи файла.");
+            throw new TasksServiceSaveException("Can't write to a file: " + e.getMessage());
         }
 
         if (allTasks.isEmpty()) {
             System.out.println("Файл пуст, записываем заголовок.");
-
             try (var writer = Files.newBufferedWriter(filePath)) {
                 writer.write("id,type,name,status,description,epicId");
                 writer.newLine();
             } catch (IOException e) {
-                System.out.println("Произошла ошибка во время записи файла.");
+                throw new TasksServiceSaveException("Can't write to a file: " + e.getMessage());
             }
         }
     }
 
     public String toString(Task task) {
-        String type = task instanceof Epic ? "epic" : task instanceof Subtask ? "subtask" : "task";
+        TaskType type = task.getType();
+        String typeToSave = type == TaskType.EPIC ? "epic" : type == TaskType.SUBTASK ? "subtask" : "task";
 
-        if (task instanceof Subtask subtask) {
-            return subtask.getId() + "," + type + "," + subtask.getName() + "," + subtask.getStatus() + "," + subtask.getDescription() + "," + subtask.getParentTaskId();
+        if (type == TaskType.SUBTASK) {
+            Subtask subtask = (Subtask) task;
+            return subtask.getId() + "," + typeToSave + "," + subtask.getName() + "," + subtask.getStatus() + "," + subtask.getDescription() + "," + subtask.getParentTaskId();
         }
 
-        return task.getId() + "," + type + "," + task.getName() + "," + task.getStatus() + "," + task.getDescription();
+        return task.getId() + "," + typeToSave + "," + task.getName() + "," + task.getStatus() + "," + task.getDescription();
     }
 
     public Status convertToStatus(String status) {
