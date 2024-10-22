@@ -34,6 +34,10 @@ public class Task {
         return status;
     }
 
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
     public void setStatus(Status status) {
         this.status = status;
     }
