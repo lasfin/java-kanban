@@ -41,4 +41,6 @@ public interface TaskService {
      void removeAll();
 
      List<Task> getHistory();
+
+     List<Task> getPrioritizedTasks();
 }

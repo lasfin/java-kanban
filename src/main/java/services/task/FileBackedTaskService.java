@@ -13,7 +13,7 @@ import java.util.List;
 
 
 public class FileBackedTaskService extends InMemoryTaskService {
-    private Path filePath;
+    private final Path filePath;
 
     public FileBackedTaskService() {
         super();
@@ -82,7 +82,7 @@ public class FileBackedTaskService extends InMemoryTaskService {
         if (allTasks.isEmpty()) {
             System.out.println("Файл пуст, записываем заголовок.");
             try (var writer = Files.newBufferedWriter(filePath)) {
-                writer.write("id,type,name,status,description,epicId");
+                writer.write("id,type,name,status,description,epicId,duration,startTime");
                 writer.newLine();
             } catch (IOException e) {
                 throw new TasksServiceSaveException("Can't write to a file: " + e.getMessage());
