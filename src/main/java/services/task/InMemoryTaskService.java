@@ -5,6 +5,7 @@ import model.Subtask;
 import model.Task;
 import services.Managers;
 import services.exeptions.TaskServiceNotFoundException;
+import services.exeptions.TaskServiceValidationException;
 import services.history.HistoryService;
 
 import java.util.ArrayList;
@@ -21,6 +22,18 @@ public class InMemoryTaskService implements TaskService {
     private final HistoryService historyService = Managers.getDefaultHistoryService();
 
     private Integer lastId = 0;
+
+    public void checkOverlap(Task task) {
+        if (task.getStartTime() != null) {
+            sortedTasks.stream()
+                .filter(t -> t.getStartTime() != null && t.getEndTime() != null)
+                .filter(t -> task.getStartTime().isBefore(t.getEndTime()) && task.getEndTime().isAfter(t.getStartTime()))
+                .findFirst()
+                .ifPresent(t -> {
+                    throw new TaskServiceValidationException("Task with id " + t.getId() + " overlaps with task with id " + task.getId());
+                });
+        }
+    }
 
     @Override
     public ArrayList<Task> getTasks() {
@@ -39,6 +52,8 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public void addTask(Task task) {
+        checkOverlap(task);
+
         lastId++;
         task.setId(lastId);
 

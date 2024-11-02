@@ -4,14 +4,15 @@ import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import services.Managers;
+import services.exeptions.TaskServiceValidationException;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskServiceManagerTest {
     TaskService taskService;
@@ -153,5 +154,18 @@ public class TaskServiceManagerTest {
         taskService.addTask(new Task("test", "test", Status.NEW));
 
         assertEquals(taskService.getPrioritizedTasks().size(), 0);
+    }
+
+    @Test
+    public void tasksWithOverlapsShouldNotExist() {
+        LocalDateTime now = LocalDateTime.now();
+        Task task1 = new Task("test", "test", Status.NEW, 20, now);
+        Task task2 = new Task("test", "test", Status.NEW, 20, now);
+
+        taskService.addTask(task1);
+
+        Assertions.assertThrows(TaskServiceValidationException.class, () -> {
+            taskService.addTask(task2);
+        });
     }
 }
