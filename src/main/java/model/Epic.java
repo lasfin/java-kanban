@@ -86,7 +86,9 @@ public class Epic extends Task {
     public Duration getDuration() {
         Duration duration = Duration.ZERO;
         for (Subtask subtask : subtasks) {
-            duration = duration.plus(subtask.getDuration());
+            if (subtask.getDuration() != null) {
+                duration = duration.plus(subtask.getDuration());
+            }
         }
         return duration;
     }

@@ -18,7 +18,7 @@ public class Task {
         this.status = status;
     }
 
-    public Task(String name, String description, Status status, int durationInMinutes, LocalDateTime startTime) {
+    public Task(String name, String description, Status status, long durationInMinutes, LocalDateTime startTime) {
         this.name = name;
         this.description = description;
         this.status = status;

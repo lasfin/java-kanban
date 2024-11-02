@@ -80,7 +80,7 @@ public class FileBackedTaskServiceTest {
             Assertions.assertEquals(1, fileBackedTaskService.getEpics().size());
             Assertions.assertEquals(1, fileBackedTaskService.getSubtasks().size());
         } catch (Exception e) {
-            Assertions.fail("Should not throw exception");
+            Assertions.fail("Should not throw exception" + e.getMessage());
         }
     }
 
@@ -91,9 +91,9 @@ public class FileBackedTaskServiceTest {
             File tempFile = File.createTempFile("fileName", ".csv");
 
             try (var writer = Files.newBufferedWriter(tempFile.toPath(), java.nio.charset.StandardCharsets.UTF_8)) {
-                writer.write("1,task,test,NEW,test task\n");
-                writer.write("2,epic,test,NEW,test external file epic\n");
-                writer.write("3,subtask,test,NEW,test subtask,2\n");
+                writer.write("1,task,test,NEW,test task,none,none\n");
+                writer.write("2,epic,test,NEW,test external file epic,none,none\n");
+                writer.write("3,subtask,test,NEW,test subtask,none,none,2\n");
             } catch (Exception e) {
                 Assertions.fail("Should not throw exception");
             }
@@ -126,10 +126,10 @@ public class FileBackedTaskServiceTest {
             File tempFile = File.createTempFile("fileNameForFileTwo", ".csv");
 
             try (var writer = Files.newBufferedWriter(tempFile.toPath(), java.nio.charset.StandardCharsets.UTF_8)) {
-                writer.write("1,task,test,NEW,test task\n");
-                writer.write("2,epic,test,NEW,test external file epic\n");
-                writer.write("3,subtask,test,NEW,test subtask,2\n");
-                writer.write("4,subtask,test,NEW,test subtask,2\n");
+                writer.write("1,task,test,NEW,test task,none,none\n");
+                writer.write("2,epic,test,NEW,test external file epic,none,none\n");
+                writer.write("3,subtask,test,NEW,test subtask,none,none,2\n");
+                writer.write("4,subtask,test,NEW,test subtask,none,none,2\n");
             } catch (Exception e) {
                 Assertions.fail("Should not throw exception");
             }
@@ -148,5 +148,34 @@ public class FileBackedTaskServiceTest {
                 new File(fileName).delete();
             }
         }
+    }
+
+
+    @Test
+    public void shouldBeAbleHandleNotNoneTime() {
+        Task task = new Task("test", "test time", Status.NEW);
+        fileBackedTaskService.addTask(task);
+        Epic epic = new Epic("test", "test time epic", Status.NEW);
+        fileBackedTaskService.addEpic(epic);
+        Subtask subtask = new Subtask("test", "test time subtask", Status.NEW, epic.getId(), 100, java.time.LocalDateTime.now());
+        fileBackedTaskService.addSubtask(subtask);
+
+
+        Assertions.assertEquals(100, fileBackedTaskService.getSubtasks().get(0).getDuration().toMinutes());
+        Assertions.assertEquals(100, fileBackedTaskService.getEpics().get(0).getDuration().toMinutes());
+    }
+
+    @Test
+    public void shouldSaveTasksOfAllTypesWithAllFields() {
+        Task task = new Task("test", "test all", Status.NEW, 100, java.time.LocalDateTime.now());
+        fileBackedTaskService.addTask(task);
+        Epic epic = new Epic("test", "test all epic", Status.NEW);
+        fileBackedTaskService.addEpic(epic);
+        Subtask subtask = new Subtask("test", "test all subtask", Status.NEW, epic.getId(), 100, java.time.LocalDateTime.now());
+        fileBackedTaskService.addSubtask(subtask);
+
+        Assertions.assertEquals(1, fileBackedTaskService.getTasks().size());
+        Assertions.assertEquals(1, fileBackedTaskService.getEpics().size());
+        Assertions.assertEquals(1, fileBackedTaskService.getSubtasks().size());
     }
 }

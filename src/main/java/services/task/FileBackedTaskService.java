@@ -1,6 +1,7 @@
 package services.task;
 
 import model.*;
+import services.exeptions.TaskServiceNotFoundException;
 import services.exeptions.TasksServiceSaveException;
 
 import java.io.BufferedReader;
@@ -8,8 +9,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class FileBackedTaskService extends InMemoryTaskService {
@@ -38,7 +42,7 @@ public class FileBackedTaskService extends InMemoryTaskService {
             System.out.println("Файл найден, загружаем данные." + filePath);
             loadFromFile(filePath);
         } else {
-            System.out.println("Файл не найден");
+            throw new TaskServiceNotFoundException("File not found: " + filePath);
         }
     }
 
@@ -82,7 +86,7 @@ public class FileBackedTaskService extends InMemoryTaskService {
         if (allTasks.isEmpty()) {
             System.out.println("Файл пуст, записываем заголовок.");
             try (var writer = Files.newBufferedWriter(filePath)) {
-                writer.write("id,type,name,status,description,epicId,duration,startTime");
+                writer.write("id,type,name,status,description,duration,startTime,epicId");
                 writer.newLine();
             } catch (IOException e) {
                 throw new TasksServiceSaveException("Can't write to a file: " + e.getMessage());
@@ -93,26 +97,37 @@ public class FileBackedTaskService extends InMemoryTaskService {
     public String toString(Task task) {
         TaskType type = task.getType();
         String typeToSave = type == TaskType.EPIC ? "epic" : type == TaskType.SUBTASK ? "subtask" : "task";
+        String duration = task.getDuration() == null ? "none" : String.valueOf(task.getDuration().toMinutes());
+        String startTime = task.getStartTime() == null ? "none" : task.getStartTime().toString();
 
         if (type == TaskType.SUBTASK) {
             Subtask subtask = (Subtask) task;
-            return subtask.getId() + "," + typeToSave + "," + subtask.getName() + "," + subtask.getStatus() + "," + subtask.getDescription() + "," + subtask.getParentTaskId();
+
+            return subtask.getId() + "," +
+                    typeToSave + "," +
+                    subtask.getName() + "," +
+                    subtask.getStatus() + "," +
+                    subtask.getDescription() + "," +
+                    duration + "," +
+                    startTime + "," +
+                    subtask.getParentTaskId();
         }
 
-        return task.getId() + "," + typeToSave + "," + task.getName() + "," + task.getStatus() + "," + task.getDescription();
+        return task.getId() + "," +
+                typeToSave + "," +
+                task.getName() + "," +
+                task.getStatus() + "," +
+                task.getDescription() + "," +
+                duration + "," +
+                startTime;
     }
 
     public Status convertToStatus(String status) {
-        if (status.equals("NEW")) {
-            return Status.NEW;
-        } else if (status.equals("IN_PROGRESS")) {
-            return Status.IN_PROGRESS;
-        } else {
-            return Status.DONE;
-        }
+        return Status.valueOf(status);
     }
 
     public Task fromString(String str) {
+        // Skip the header
         if (str.startsWith("id")) {
             return null;
         }
@@ -124,16 +139,29 @@ public class FileBackedTaskService extends InMemoryTaskService {
         String name = parts[2];
         Status status = convertToStatus(parts[3]);
         String description = parts[4];
+        String duration = parts[5];
+        String startTime = parts[6];
 
-        if (parts.length == 6) {
-            int epicId = Integer.parseInt(parts[5]);
-            Subtask subtask = new Subtask(name, description, status, epicId);
+        Duration durationFinal;
+        LocalDateTime startTimeFinal;
+
+        durationFinal = Objects.equals(duration, "none") ? null : Duration.ofMinutes(Long.parseLong(duration));
+        startTimeFinal = Objects.equals(startTime, "none") ? null : LocalDateTime.parse(startTime);
+
+
+        if (parts.length == 8) {
+            int epicId = Integer.parseInt(parts[7]);
+            Subtask subtask = durationFinal != null
+                    ? new Subtask(name, description, status, epicId, durationFinal.toMinutes(), startTimeFinal)
+                    : new Subtask(name, description, status, epicId);
             subtask.setId(id);
             return subtask;
         }
 
         if (type.equals("task")) {
-            Task task = new Task(name, description, status);
+            Task task = durationFinal != null
+                    ? new Task(name, description, status, durationFinal.toMinutes(), startTimeFinal)
+                    : new Task(name, description, status);
             task.setId(id);
             return task;
         } else {
