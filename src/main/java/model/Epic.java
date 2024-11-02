@@ -1,5 +1,7 @@
 package model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -78,5 +80,32 @@ public class Epic extends Task {
     @Override
     public TaskType getType() {
         return TaskType.EPIC;
+    }
+
+    @Override
+    public Duration getDuration() {
+        Duration duration = Duration.ZERO;
+        for (Subtask subtask : subtasks) {
+            duration = duration.plus(subtask.getDuration());
+        }
+        return duration;
+    }
+
+    @Override
+    public void setDuration(Duration duration) {
+        throw new UnsupportedOperationException("Duration is calculated from subtasks");
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        LocalDateTime endTime = LocalDateTime.MIN;
+
+        for (Subtask subtask : subtasks) {
+            if (subtask.getEndTime().isAfter(endTime)) {
+                endTime = subtask.getEndTime();
+            }
+        }
+
+        return endTime;
     }
 }

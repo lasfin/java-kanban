@@ -27,7 +27,6 @@ public class InMemoryHistoryServiceTest {
     @Test
     public void shouldRemoveTaskFromHistory() {
         Epic epic = new Epic("test", "test", Status.NEW);
-        epic.setId(2);
 
         historyService.add(task);
         historyService.add(epic);

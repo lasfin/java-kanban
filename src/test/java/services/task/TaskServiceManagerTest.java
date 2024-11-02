@@ -4,22 +4,30 @@ import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import services.Managers;
+
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TaskServiceManagerTest {
+    TaskService taskService;
+
+    @BeforeEach
+    public void setUp() {
+        taskService = Managers.getDefault();
+    }
+
     @Test
     public void shouldReturnDefaultTaskService() {
-        TaskService taskService = Managers.getDefault();
         assertNotNull(taskService);
     }
 
     @Test
-    void firstTasksAddedWithRightId() {
-        TaskService taskService = Managers.getDefault();
+    public void firstTasksAddedWithRightId() {
         Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
         Task task2 = new Task("Create a second task", "Create a new task for the project", Status.NEW);
         taskService.addTask(task1);
@@ -31,7 +39,6 @@ public class TaskServiceManagerTest {
 
     @Test
     public void shouldBeAbleToAddDifferentTasks() {
-        TaskService taskService = Managers.getDefault();
         Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
         Task task2 = new Task("Create a second task", "Create a second task for the project", Status.NEW);
         taskService.addTask(task1);
@@ -42,7 +49,6 @@ public class TaskServiceManagerTest {
 
     @Test
     public void epicShouldChangeStatusWhenSubtaskStatusChanged() {
-        TaskService taskService = Managers.getDefault();
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         taskService.addEpic(epic1);
         Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.NEW, epic1.getId());
@@ -55,8 +61,7 @@ public class TaskServiceManagerTest {
     }
 
     @Test
-    void epicShouldChangeStatusWhenSubtaskDeleted() {
-        TaskService taskService = Managers.getDefault();
+    public void epicShouldChangeStatusWhenSubtaskDeleted() {
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         taskService.addEpic(epic1);
         Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.IN_PROGRESS, epic1.getId());
@@ -69,8 +74,7 @@ public class TaskServiceManagerTest {
 
 
     @Test
-    void allSubtasksTasksShouldBeDeletedWhenEpicDeleted() {
-        TaskService taskService = Managers.getDefault();
+    public void allSubtasksTasksShouldBeDeletedWhenEpicDeleted() {
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         taskService.addEpic(epic1);
         Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.IN_PROGRESS, epic1.getId());
@@ -85,8 +89,7 @@ public class TaskServiceManagerTest {
     }
 
     @Test
-    void allTasksDeletedAfterDeleteAllCalled() {
-        TaskService taskService = Managers.getDefault();
+    public void allTasksDeletedAfterDeleteAllCalled() {
         Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
         taskService.addTask(task1);
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
@@ -101,8 +104,7 @@ public class TaskServiceManagerTest {
     }
 
     @Test
-    void testEpicWithNewAndInProgress() {
-        TaskService taskService = Managers.getDefault();
+    public void testEpicWithNewAndInProgress() {
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         taskService.addEpic(epic1);
         Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.IN_PROGRESS, epic1.getId());
@@ -114,8 +116,7 @@ public class TaskServiceManagerTest {
     }
 
     @Test
-    void testEpicWithDoneAndNew() {
-        TaskService taskService = Managers.getDefault();
+    public void testEpicWithDoneAndNew() {
         Epic epic1 = new Epic("Epic 1", "Create a new epic for the project", Status.NEW);
         taskService.addEpic(epic1);
         Subtask subtask1 = new Subtask("Subtask 1", "Subtask 1 description", Status.DONE, epic1.getId());
@@ -124,5 +125,33 @@ public class TaskServiceManagerTest {
         taskService.addSubtask(subtask2);
 
         assertEquals(epic1.getStatus(), Status.IN_PROGRESS);
+    }
+
+    @Test
+    public void shouldGetPrioritizedTasks() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime later = now.plusDays(1);
+        LocalDateTime evenLater = now.plusDays(2);
+
+        Task task1 = new Task("test", "test", Status.NEW, 10, now);
+        task1.setId(1);
+        Task task2 = new Task("test", "test", Status.NEW, 5, later);
+        task2.setId(2);
+        Task task3 = new Task("test", "test", Status.NEW, 15, evenLater);
+        task3.setId(3);
+
+        taskService.addTask(task3);
+        taskService.addTask(task1);
+        taskService.addTask(task2);
+
+        assertEquals(taskService.getPrioritizedTasks().get(0), task1);
+    }
+
+    @Test
+    public void taskWithoutStartTimeShouldNotBeInList() {
+        taskService.addTask(new Task("test", "test", Status.NEW));
+        taskService.addTask(new Task("test", "test", Status.NEW));
+
+        assertEquals(taskService.getPrioritizedTasks().size(), 0);
     }
 }
