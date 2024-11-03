@@ -4,12 +4,14 @@ import model.Epic;
 import model.Status;
 import model.Subtask;
 import model.Task;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import services.exeptions.TasksServiceSaveException;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -19,12 +21,16 @@ public class FileBackedTaskServiceTest {
     @BeforeEach
     public void setUp() {
         fileBackedTaskService = new FileBackedTaskService();
+    }
+
+    @AfterEach
+    public void tearDown() {
         fileBackedTaskService.removeAll();
     }
 
     @Test
     public void shouldAddOneTask() {
-        Task task = new Task("test", "test add one", Status.NEW);
+        Task task = new Task("test3", "test add 3", Status.NEW);
         fileBackedTaskService.addTask(task);
 
         Assertions.assertEquals(1, fileBackedTaskService.getTasks().size());
@@ -91,17 +97,19 @@ public class FileBackedTaskServiceTest {
             File tempFile = File.createTempFile("fileName", ".csv");
 
             try (var writer = Files.newBufferedWriter(tempFile.toPath(), java.nio.charset.StandardCharsets.UTF_8)) {
-                writer.write("1,task,test,NEW,test task,none,none\n");
-                writer.write("2,epic,test,NEW,test external file epic,none,none\n");
-                writer.write("3,subtask,test,NEW,test subtask,none,none,2\n");
+                writer.write("1,task,test,NEW,test task,none,none,\n");
+                writer.write("2,epic,test,NEW,test external file epic2,none,none,\n");
+                writer.write("3,subtask,test,NEW,test subtask,none,none,2,\n");
+                writer.write("5,task,test,NEW,test task5,100,03-Nov-24-01:06,\n"); // task with time
+                writer.write("6,subtask,test,NEW,test subtask6,100,04-Nov-21-02:05,2,\n"); // subtask with time
             } catch (Exception e) {
-                Assertions.fail("Should not throw exception");
+                Assertions.fail("Should not throw exception: " + e.getCause() + e.getMessage());
             }
             fileBackedTaskService = new FileBackedTaskService(tempFile);
 
-            Assertions.assertEquals(1, fileBackedTaskService.getTasks().size());
+            Assertions.assertEquals(2, fileBackedTaskService.getTasks().size());
             Assertions.assertEquals(1, fileBackedTaskService.getEpics().size());
-            Assertions.assertEquals(1, fileBackedTaskService.getSubtasks().size());
+            Assertions.assertEquals(2, fileBackedTaskService.getSubtasks().size());
         } catch (Exception e) {
             Assertions.fail("Should not throw exception");
         } finally {
@@ -127,22 +135,23 @@ public class FileBackedTaskServiceTest {
 
             try (var writer = Files.newBufferedWriter(tempFile.toPath(), java.nio.charset.StandardCharsets.UTF_8)) {
                 writer.write("1,task,test,NEW,test task,none,none\n");
-                writer.write("2,epic,test,NEW,test external file epic,none,none\n");
+                writer.write("2,epic,test,NEW,test external file epic2,none,none\n");
+                writer.write("7,epic,test,NEW,test external file epic7,none,none\n");
                 writer.write("3,subtask,test,NEW,test subtask,none,none,2\n");
                 writer.write("4,subtask,test,NEW,test subtask,none,none,2\n");
             } catch (Exception e) {
-                Assertions.fail("Should not throw exception");
+                Assertions.fail("Should not throw exception " + e.getMessage());
             }
 
             fileBackedTaskService = FileBackedTaskService.loadFromFile(tempFile);
-
             Assertions.assertEquals(1, fileBackedTaskService.getTasks().size());
-            Assertions.assertEquals(1, fileBackedTaskService.getEpics().size());
+            Assertions.assertEquals(2, fileBackedTaskService.getEpics().size());
             Assertions.assertEquals(2, fileBackedTaskService.getSubtasks().size());
-
-
-        } catch (Exception e) {
-            Assertions.fail("Should not throw exception");
+            for (Epic epic : fileBackedTaskService.getEpics()) {
+                System.out.println(epic);
+            }
+        } catch (IOException e) {
+            Assertions.fail("Should not throw IOException " + e.getMessage());
         } finally {
             if (Files.exists(new File(fileName).toPath())) {
                 new File(fileName).delete();

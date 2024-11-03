@@ -4,20 +4,19 @@ import model.*;
 import services.exeptions.TaskServiceNotFoundException;
 import services.exeptions.TasksServiceSaveException;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 
 public class FileBackedTaskService extends InMemoryTaskService {
     private final Path filePath;
+    private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("dd-MMM-yy-HH:mm", Locale.ENGLISH);
 
     public FileBackedTaskService() {
         super();
@@ -47,12 +46,13 @@ public class FileBackedTaskService extends InMemoryTaskService {
     }
 
     public void loadFromFile(Path filePath) {
-        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-            String line;
+        try (Scanner fileScanner = new Scanner(Files.newBufferedReader(filePath))) {
+            fileScanner.useDelimiter(System.lineSeparator());
 
-            while ((line = reader.readLine()) != null) {
+            while (fileScanner.hasNext()) {
+                String line = fileScanner.next().trim();
+                if (line.isEmpty()) continue;
                 Task task = fromString(line);
-                System.out.println("Loaded task: " + task);
 
                 if (task instanceof Epic) {
                     addEpic((Epic) task);
@@ -65,7 +65,6 @@ public class FileBackedTaskService extends InMemoryTaskService {
         } catch (IOException e) {
             throw new TasksServiceSaveException("Can't read from a file: " + e.getMessage());
         }
-
     }
 
     public void save() {
@@ -98,7 +97,10 @@ public class FileBackedTaskService extends InMemoryTaskService {
         TaskType type = task.getType();
         String typeToSave = type == TaskType.EPIC ? "epic" : type == TaskType.SUBTASK ? "subtask" : "task";
         String duration = task.getDuration() == null ? "none" : String.valueOf(task.getDuration().toMinutes());
-        String startTime = task.getStartTime() == null ? "none" : task.getStartTime().toString();
+        String startTime = task.getStartTime() == null ? "none" :
+                LocalDateTime.from(
+                    task.getStartTime()
+                ).format(FORMAT);
 
         if (type == TaskType.SUBTASK) {
             Subtask subtask = (Subtask) task;
@@ -110,7 +112,7 @@ public class FileBackedTaskService extends InMemoryTaskService {
                     subtask.getDescription() + "," +
                     duration + "," +
                     startTime + "," +
-                    subtask.getParentTaskId();
+                    subtask.getParentTaskId() + ",";
         }
 
         return task.getId() + "," +
@@ -119,7 +121,7 @@ public class FileBackedTaskService extends InMemoryTaskService {
                 task.getStatus() + "," +
                 task.getDescription() + "," +
                 duration + "," +
-                startTime;
+                startTime + ",";
     }
 
     public Status convertToStatus(String status) {
@@ -128,7 +130,7 @@ public class FileBackedTaskService extends InMemoryTaskService {
 
     public Task fromString(String str) {
         // Skip the header
-        if (str.startsWith("id")) {
+        if (str.startsWith("id") || str.isBlank() || str.startsWith("-")) {
             return null;
         }
 
@@ -146,8 +148,7 @@ public class FileBackedTaskService extends InMemoryTaskService {
         LocalDateTime startTimeFinal;
 
         durationFinal = Objects.equals(duration, "none") ? null : Duration.ofMinutes(Long.parseLong(duration));
-        startTimeFinal = Objects.equals(startTime, "none") ? null : LocalDateTime.parse(startTime);
-
+        startTimeFinal = Objects.equals(startTime, "none") ? null : LocalDateTime.parse(startTime, FORMAT);
 
         if (parts.length == 8) {
             int epicId = Integer.parseInt(parts[7]);
