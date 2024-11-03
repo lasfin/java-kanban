@@ -83,7 +83,6 @@ public class InMemoryTaskService implements TaskService {
         int parentTaskId = subtask.getParentTaskId();
 
         Epic epic = epics.get(parentTaskId);
-        System.out.println("parentTaskId = " + parentTaskId);
         epic.addSubtask(subtask);
 
         if (subtask.getStartTime() != null) {
