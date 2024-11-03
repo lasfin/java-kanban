@@ -125,6 +125,8 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public void updateSubtask(Subtask subtask) {
+        checkOverlap(subtask);
+
         int parentTaskId = subtask.getParentTaskId();
         Subtask oldSubtask = subtasks.get(subtask.getId());
 
@@ -151,6 +153,8 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public void updateTask(Task task) {
+        checkOverlap(task);
+
         Task oldTask = tasks.get(task.getId());
         tasks.put(task.getId(), task);
 
