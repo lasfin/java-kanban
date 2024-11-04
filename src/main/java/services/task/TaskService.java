@@ -38,6 +38,12 @@ public interface TaskService {
 
      void updateEpic(Epic epic);
 
+     void removeAllTasks();
+
+     void removeAllEpics();
+
+     void removeAllSubtasks();
+
      void removeAll();
 
      List<Task> getHistory();

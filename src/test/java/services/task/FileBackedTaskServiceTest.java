@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import services.exeptions.TaskServiceValidationException;
 import services.exeptions.TasksServiceSaveException;
 
 import java.io.File;
@@ -176,7 +177,7 @@ public class FileBackedTaskServiceTest {
 
     @Test
     public void shouldSaveTasksOfAllTypesWithAllFields() {
-        Task task = new Task("test", "test all", Status.NEW, 100, java.time.LocalDateTime.now());
+        Task task = new Task("test", "test all", Status.NEW, 100, java.time.LocalDateTime.now().plusDays(2));
         fileBackedTaskService.addTask(task);
         Epic epic = new Epic("test", "test all epic", Status.NEW);
         fileBackedTaskService.addEpic(epic);
@@ -186,5 +187,19 @@ public class FileBackedTaskServiceTest {
         Assertions.assertEquals(1, fileBackedTaskService.getTasks().size());
         Assertions.assertEquals(1, fileBackedTaskService.getEpics().size());
         Assertions.assertEquals(1, fileBackedTaskService.getSubtasks().size());
+    }
+
+    @Test
+    public void subtaskShouldThrowExceptionOnOverlap() {
+        Task task = new Task("test", "test all", Status.NEW, 100, java.time.LocalDateTime.now());
+        fileBackedTaskService.addTask(task);
+        Epic epic = new Epic("test", "test all epic", Status.NEW);
+        fileBackedTaskService.addEpic(epic);
+
+        Subtask subtask = new Subtask("test", "test all subtask", Status.NEW, epic.getId(), 100, java.time.LocalDateTime.now());
+
+        Assertions.assertThrows(TaskServiceValidationException.class, () -> {
+            fileBackedTaskService.addSubtask(subtask);
+        });
     }
 }

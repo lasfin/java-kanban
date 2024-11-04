@@ -129,6 +129,30 @@ public class TaskServiceManagerTest {
     }
 
     @Test
+    public void deleteShouldDeleteTasksFromHistory() {
+        Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
+        Task task2 = new Task("Create a second task", "Create a new task for the project", Status.NEW);
+        taskService.addTask(task1);
+        taskService.addTask(task2);
+
+        taskService.removeAllTasks();
+
+        assertEquals(taskService.getHistory().size(), 0);
+    }
+
+    @Test
+    public void deleteShouldDeleteFromSortedTasks() {
+        Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
+        Task task2 = new Task("Create a second task", "Create a new task for the project", Status.NEW);
+        taskService.addTask(task1);
+        taskService.addTask(task2);
+
+        taskService.removeAllTasks();
+
+        assertEquals(taskService.getPrioritizedTasks().size(), 0);
+    }
+
+    @Test
     public void shouldGetPrioritizedTasks() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime later = now.plusDays(1);

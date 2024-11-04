@@ -198,10 +198,50 @@ public class InMemoryTaskService implements TaskService {
     }
 
     @Override
+    public void removeAllTasks() {
+        new ArrayList<>(tasks.values())
+            .forEach(task -> {
+                tasks.remove(task.getId());
+                historyService.remove(task.getId());
+                sortedTasks.remove(task);
+            });
+    }
+
+    @Override
+    public void removeAllSubtasks() {
+        new ArrayList<>(subtasks.values())
+            .forEach(subtask -> {
+                int parentTaskId = subtask.getParentTaskId();
+                Epic epic = epics.get(parentTaskId);
+                epic.removeSubtask(subtask);
+                subtasks.remove(subtask.getId());
+                historyService.remove(subtask.getId());
+                sortedTasks.remove(subtask);
+            });
+    }
+
+    @Override
+    public void removeAllEpics() {
+        new ArrayList<>(epics.values())
+            .forEach(epic -> {
+                ArrayList<Subtask> epicSubtasks = epic.getSubtasks();
+                epicSubtasks.forEach(subtask -> {
+                    subtasks.remove(subtask.getId());
+                    historyService.remove(subtask.getId());
+                    sortedTasks.remove(subtask);
+                });
+
+                epics.remove(epic.getId());
+                historyService.remove(epic.getId());
+                sortedTasks.remove(epic);
+            });
+    }
+
+    @Override
     public void removeAll() {
-        tasks.clear();
-        epics.clear();
-        subtasks.clear();
+        removeAllTasks();
+        removeAllEpics();
+        removeAllSubtasks();
     }
 
     @Override
