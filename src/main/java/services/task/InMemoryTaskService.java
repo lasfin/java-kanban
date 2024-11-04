@@ -76,6 +76,8 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public void addSubtask(Subtask subtask) {
+        checkOverlap(subtask);
+
         lastId++;
         subtask.setId(lastId);
         subtasks.put(lastId, subtask);
