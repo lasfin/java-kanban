@@ -174,9 +174,11 @@ public class FileBackedTaskService extends InMemoryTaskService {
 
 
     @Override
-    public void addTask(Task task) {
-        super.addTask(task);
+    public Task addTask(Task task) {
+        Task added = super.addTask(task);
         save();
+
+        return added;
     }
 
     @Override

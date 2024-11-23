@@ -4,9 +4,11 @@ import api.tasks.adapters.TasksDurationAdapter;
 import api.tasks.adapters.TasksLocalDateAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import model.Status;
 import model.Task;
 import services.task.TaskService;
 
@@ -26,9 +28,6 @@ public class TasksHandler implements HttpHandler {
     private final Gson gson;
 
     public TasksHandler(TaskService taskService) {
-        if (taskService == null) {
-            throw new IllegalArgumentException("TaskService cannot be null");
-        }
         this.tasks = taskService;
 
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -45,6 +44,8 @@ public class TasksHandler implements HttpHandler {
         try {
             String path = exchange.getRequestURI().getPath();
             String method = exchange.getRequestMethod();
+            JsonElement jsonElementBody = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), JsonElement.class);
+
             LOGGER.info("Handling request: " + method + " " + path);
             Endpoint endpoint = getEndpoint(path, method);
 
@@ -86,6 +87,47 @@ public class TasksHandler implements HttpHandler {
                         writeResponse(exchange, Map.of("error", "Error deleting task"), 500);
                     }
                 }
+                case UPDATE_OR_CREATE_TASK -> {
+                    try {
+                        JsonElement id = jsonElementBody
+                                .getAsJsonObject()
+                                .get("id");
+
+                        if (id == null) {
+                            String name = jsonElementBody.getAsJsonObject()
+                                    .get("name").getAsString();
+                            String description = jsonElementBody.getAsJsonObject()
+                                    .get("description").getAsString();
+
+                            Task added = this.tasks.addTask(new Task(
+                                    name,
+                                    description,
+                                    Status.NEW
+                            ));
+
+                            writeResponse(exchange, added, 200);
+                        } else {
+                            try (InputStream is = exchange.getRequestBody();
+                                 InputStreamReader isr = new InputStreamReader(is);
+                                 BufferedReader br = new BufferedReader(isr)) {
+                                Task taskToUpdate = this.tasks.getTask(Integer.parseInt(id.getAsString()));
+                                String body = br.readLine();
+
+                                Task updatedTask = gson.fromJson(body, Task.class);
+
+                                taskToUpdate.setName(updatedTask.getName());
+                                taskToUpdate.setDescription(updatedTask.getDescription());
+                                taskToUpdate.setDuration(updatedTask.getDuration());
+                                taskToUpdate.setStatus(updatedTask.getStatus());
+                            }
+
+                            writeResponse(exchange, null, 200);
+                        }
+                    } catch (Exception e) {
+                        LOGGER.severe("Error updating task: " + e.getMessage());
+                        writeResponse(exchange, Map.of("error", "Error updating task"), 500);
+                    }
+                }
 
                 default -> writeResponse(exchange, Map.of("error", "Endpoint not found"), 404);
             }
@@ -108,8 +150,8 @@ public class TasksHandler implements HttpHandler {
             return Endpoint.GET_TASKS;
         } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("GET") && pathParts.size() == 2) {
             return Endpoint.GET_TASK;
-        } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("PUT") && pathParts.size() == 2) {
-            return Endpoint.UPDATE_TASK;
+        } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("POST")) {
+            return Endpoint.UPDATE_OR_CREATE_TASK;
         } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("DELETE") && pathParts.size() == 2) {
             return Endpoint.DELETE_TASK;
         } else {
@@ -139,7 +181,7 @@ public class TasksHandler implements HttpHandler {
     enum Endpoint {
         GET_TASKS,
         GET_TASK,
-        UPDATE_TASK,
+        UPDATE_OR_CREATE_TASK,
         DELETE_TASK,
         UNKNOWN
     }

@@ -14,7 +14,7 @@ public interface TaskService {
 
      ArrayList<Subtask> getSubtasks();
 
-     void addTask(Task task);
+     Task addTask(Task task);
 
      void removeTask(Task task);
 
