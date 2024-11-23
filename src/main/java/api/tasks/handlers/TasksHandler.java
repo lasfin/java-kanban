@@ -4,8 +4,6 @@ import api.tasks.adapters.TasksDurationAdapter;
 import api.tasks.adapters.TasksLocalDateAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import model.Status;
@@ -13,178 +11,109 @@ import model.Task;
 import services.task.TaskService;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
 
 public class TasksHandler implements HttpHandler {
-    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private static final Logger LOGGER = Logger.getLogger(TasksHandler.class.getName());
     private final TaskService tasks;
     private final Gson gson;
 
     public TasksHandler(TaskService taskService) {
         this.tasks = taskService;
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Duration.class, new TasksDurationAdapter());
-        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new TasksLocalDateAdapter());
-
-        this.gson = gsonBuilder
+        this.gson = new GsonBuilder()
+                .registerTypeAdapter(Duration.class, new TasksDurationAdapter())
+                .registerTypeAdapter(LocalDateTime.class, new TasksLocalDateAdapter())
                 .setPrettyPrinting()
                 .create();
     }
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        String path = exchange.getRequestURI().getPath();
+        String method = exchange.getRequestMethod();
+
         try {
-            String path = exchange.getRequestURI().getPath();
-            String method = exchange.getRequestMethod();
-            JsonElement jsonElementBody = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), JsonElement.class);
+            switch (method) {
+                case "GET" -> handleGet(exchange, path);
+                case "POST" -> handlePost(exchange);
+                case "DELETE" -> handleDelete(exchange, path);
 
-            LOGGER.info("Handling request: " + method + " " + path);
-            Endpoint endpoint = getEndpoint(path, method);
-
-            switch (endpoint) {
-                case GET_TASKS -> {
-                    try {
-                        var tasks = this.tasks.getTasks();
-                        writeResponse(exchange, tasks, 200);
-                    } catch (Exception e) {
-                        LOGGER.severe("Error getting tasks: " + e.getMessage());
-                        writeResponse(exchange, Map.of("error", "Error retrieving tasks"), 500);
-                    }
-                }
-                case GET_TASK -> {
-                    try {
-                        String[] pathParts = path.split("/");
-                        String taskId = pathParts[2];
-                        var task = this.tasks.getTask(Integer.parseInt(taskId));
-                        if (task == null) {
-                            writeResponse(exchange, Map.of("error", "Task not found"), 404);
-                        } else {
-                            writeResponse(exchange, task, 200);
-                        }
-                    } catch (Exception e) {
-                        LOGGER.severe("Error getting task: " + e.getMessage());
-                        writeResponse(exchange, Map.of("error", "Error retrieving task"), 500);
-                    }
-                }
-                case DELETE_TASK -> {
-                    try {
-                        String[] pathParts = path.split("/");
-                        String taskId = pathParts[2];
-                        Task taskToDelete = this.tasks.getTask(Integer.parseInt(taskId));
-
-                        this.tasks.removeTask(taskToDelete);
-                        writeResponse(exchange, null, 201);
-                    } catch (Exception e) {
-                        LOGGER.severe("Error deleting task: " + e.getMessage());
-                        writeResponse(exchange, Map.of("error", "Error deleting task"), 500);
-                    }
-                }
-                case UPDATE_OR_CREATE_TASK -> {
-                    try {
-                        JsonElement id = jsonElementBody
-                                .getAsJsonObject()
-                                .get("id");
-
-                        if (id == null) {
-                            String name = jsonElementBody.getAsJsonObject()
-                                    .get("name").getAsString();
-                            String description = jsonElementBody.getAsJsonObject()
-                                    .get("description").getAsString();
-
-                            Task added = this.tasks.addTask(new Task(
-                                    name,
-                                    description,
-                                    Status.NEW
-                            ));
-
-                            writeResponse(exchange, added, 200);
-                        } else {
-                            try (InputStream is = exchange.getRequestBody();
-                                 InputStreamReader isr = new InputStreamReader(is);
-                                 BufferedReader br = new BufferedReader(isr)) {
-                                Task taskToUpdate = this.tasks.getTask(Integer.parseInt(id.getAsString()));
-                                String body = br.readLine();
-
-                                Task updatedTask = gson.fromJson(body, Task.class);
-
-                                taskToUpdate.setName(updatedTask.getName());
-                                taskToUpdate.setDescription(updatedTask.getDescription());
-                                taskToUpdate.setDuration(updatedTask.getDuration());
-                                taskToUpdate.setStatus(updatedTask.getStatus());
-                            }
-
-                            writeResponse(exchange, null, 200);
-                        }
-                    } catch (Exception e) {
-                        LOGGER.severe("Error updating task: " + e.getMessage());
-                        writeResponse(exchange, Map.of("error", "Error updating task"), 500);
-                    }
-                }
-
-                default -> writeResponse(exchange, Map.of("error", "Endpoint not found"), 404);
+                default -> sendResponse(exchange, Map.of("error", "Method not allowed"), 405);
             }
         } catch (Exception e) {
-            LOGGER.severe("Unhandled error in handler: " + e.getMessage());
-            writeResponse(exchange, Map.of("error", "Internal server error"), 500);
+            LOGGER.severe("Error handling request: " + e.getMessage());
+            sendResponse(exchange, Map.of("error", e.getMessage()), 500);
         }
     }
 
-    private Endpoint getEndpoint(String requestPath, String requestMethod) {
-        ArrayList<String> pathParts = new ArrayList<>();
-        for (String part : requestPath.split("/")) {
-            if (!part.isEmpty()) {
-                pathParts.add(part);
+    private void handleGet(HttpExchange exchange, String path) throws IOException {
+        String[] pathParts = path.split("/");
+        if (pathParts.length == 2) {
+            sendResponse(exchange, tasks.getTasks(), 200);
+        } else if (pathParts.length == 3) {
+            Task task = tasks.getTask(Integer.parseInt(pathParts[2]));
+            if (task != null) {
+                sendResponse(exchange, task, 200);
+            } else {
+                sendResponse(exchange, Map.of("error", "Task not found"), 404);
             }
         }
-        System.out.println("pathParts: " + pathParts);
+    }
 
-        if (requestPath.equals("/tasks") && requestMethod.equals("GET")) {
-            return Endpoint.GET_TASKS;
-        } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("GET") && pathParts.size() == 2) {
-            return Endpoint.GET_TASK;
-        } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("POST")) {
-            return Endpoint.UPDATE_OR_CREATE_TASK;
-        } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("DELETE") && pathParts.size() == 2) {
-            return Endpoint.DELETE_TASK;
+    private void handlePost(HttpExchange exchange) throws IOException {
+        var json = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), Map.class);
+
+        if (json.get("id") == null) {
+            Task newTask = new Task(
+                    (String) json.get("name"),
+                    (String) json.get("description"),
+                    Status.NEW
+            );
+            sendResponse(exchange, tasks.addTask(newTask), 200);
         } else {
-            return Endpoint.UNKNOWN;
+            Task existingTask = tasks.getTask(Integer.parseInt((String) json.get("id")));
+            if (existingTask != null) {
+                updateTask(existingTask, json);
+                sendResponse(exchange, existingTask, 200);
+            } else {
+                sendResponse(exchange, Map.of("error", "Task not found"), 404);
+            }
         }
     }
 
-    private void writeResponse(HttpExchange exchange, Object response, int responseCode) throws IOException {
-        if (exchange == null) {
-            throw new IllegalArgumentException("Exchange cannot be null");
+    private void handleDelete(HttpExchange exchange, String path) throws IOException {
+        String[] pathParts = path.split("/");
+        if (pathParts.length == 3) {
+            Task task = tasks.getTask(Integer.parseInt(pathParts[2]));
+            if (task != null) {
+                tasks.removeTask(task);
+                sendResponse(exchange, null, 204);
+            } else {
+                sendResponse(exchange, Map.of("error", "Task not found"), 404);
+            }
         }
-        String responseString = gson.toJson(response);
-        byte[] responseBytes = responseString.getBytes(DEFAULT_CHARSET);
+    }
 
-        Headers headers = exchange.getResponseHeaders();
-        headers.set("Content-Type", "application/json; charset=utf-8");
-        exchange.sendResponseHeaders(responseCode, responseBytes.length);
+    private void updateTask(Task task, Map<String, Object> json) {
+        if (json.get("name") != null) task.setName((String) json.get("name"));
+        if (json.get("description") != null) task.setDescription((String) json.get("description"));
+        if (json.get("status") != null) task.setStatus(Status.valueOf((String) json.get("status")));
+        if (json.get("duration") != null) task.setDuration(Duration.parse((String) json.get("duration")));
+    }
+
+    private void sendResponse(HttpExchange exchange, Object response, int statusCode) throws IOException {
+        String responseBody = response != null ? gson.toJson(response) : "";
+        byte[] responseBytes = responseBody.getBytes(StandardCharsets.UTF_8);
+
+        exchange.getResponseHeaders().set("Content-Type", "application/json");
+        exchange.sendResponseHeaders(statusCode, responseBytes.length);
 
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(responseBytes);
-            os.flush();
         }
-
-        exchange.close();
-    }
-
-    enum Endpoint {
-        GET_TASKS,
-        GET_TASK,
-        UPDATE_OR_CREATE_TASK,
-        DELETE_TASK,
-        UNKNOWN
     }
 }
-
-
