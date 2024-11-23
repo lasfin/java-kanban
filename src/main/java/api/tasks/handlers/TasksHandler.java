@@ -55,10 +55,10 @@ public class TasksHandler implements HttpHandler {
         if (pathParts.length == 2) {
             sendResponse(exchange, tasks.getTasks(), 200);
         } else if (pathParts.length == 3) {
-            Task task = tasks.getTask(Integer.parseInt(pathParts[2]));
-            if (task != null) {
+            try {
+                Task task = tasks.getTask(Integer.parseInt(pathParts[2]));
                 sendResponse(exchange, task, 200);
-            } else {
+            } catch (Exception e) {
                 sendResponse(exchange, Map.of("error", "Task not found"), 404);
             }
         }
@@ -73,12 +73,12 @@ public class TasksHandler implements HttpHandler {
                     (String) json.get("description"),
                     Status.NEW
             );
-            sendResponse(exchange, tasks.addTask(newTask), 200);
+            sendResponse(exchange, tasks.addTask(newTask), 201);
         } else {
             Task existingTask = tasks.getTask(Integer.parseInt((String) json.get("id")));
             if (existingTask != null) {
                 updateTask(existingTask, json);
-                sendResponse(exchange, existingTask, 200);
+                sendResponse(exchange, existingTask, 201);
             } else {
                 sendResponse(exchange, Map.of("error", "Task not found"), 404);
             }
@@ -91,7 +91,7 @@ public class TasksHandler implements HttpHandler {
             Task task = tasks.getTask(Integer.parseInt(pathParts[2]));
             if (task != null) {
                 tasks.removeTask(task);
-                sendResponse(exchange, null, 204);
+                sendResponse(exchange, null, 200);
             } else {
                 sendResponse(exchange, Map.of("error", "Task not found"), 404);
             }
