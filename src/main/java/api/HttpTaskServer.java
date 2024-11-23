@@ -14,6 +14,8 @@ public class HttpTaskServer {
         httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(port), 0);
         httpServer.createContext("/tasks", new TasksHandler(taskService));
+        // httpServer.createContext("/history", new HistotyHandler(taskService));
+        // httpServer.createContext("/prioritized", new PriotizedHandler(taskService));
         httpServer.start();
         System.out.println("Starting server on port " + port);
     }
