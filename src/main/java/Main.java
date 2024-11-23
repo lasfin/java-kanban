@@ -18,7 +18,7 @@ public class Main {
         taskService.addTask(task1);
         taskService.addTask(task2);
 
-        HttpTaskServer.main(args, taskService);
+        HttpTaskServer.main(args, taskService, 8080);
     }
 
     public static void runGeneralFlow() {

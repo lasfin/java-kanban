@@ -1,5 +1,7 @@
-package api.tasks;
+package api.tasks.handlers;
 
+import api.tasks.adapters.TasksDurationAdapter;
+import api.tasks.adapters.TasksLocalDateAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.Headers;
@@ -12,7 +14,6 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
@@ -45,18 +46,13 @@ public class TasksHandler implements HttpHandler {
             String path = exchange.getRequestURI().getPath();
             String method = exchange.getRequestMethod();
             LOGGER.info("Handling request: " + method + " " + path);
-
             Endpoint endpoint = getEndpoint(path, method);
 
             switch (endpoint) {
                 case GET_TASKS -> {
                     try {
                         var tasks = this.tasks.getTasks();
-                        if (tasks == null || tasks.isEmpty()) {
-                            writeResponse(exchange, Map.of("error", "No tasks found"), 404);
-                        } else {
-                            writeResponse(exchange, tasks, 200);
-                        }
+                        writeResponse(exchange, tasks, 200);
                     } catch (Exception e) {
                         LOGGER.severe("Error getting tasks: " + e.getMessage());
                         writeResponse(exchange, Map.of("error", "Error retrieving tasks"), 500);
@@ -65,10 +61,6 @@ public class TasksHandler implements HttpHandler {
                 case GET_TASK -> {
                     try {
                         String[] pathParts = path.split("/");
-                        if (pathParts.length < 2) {
-                            writeResponse(exchange, Map.of("error", "Invalid task ID"), 400);
-                            return;
-                        }
                         String taskId = pathParts[2];
                         var task = this.tasks.getTask(Integer.parseInt(taskId));
                         if (task == null) {
@@ -81,6 +73,20 @@ public class TasksHandler implements HttpHandler {
                         writeResponse(exchange, Map.of("error", "Error retrieving task"), 500);
                     }
                 }
+                case DELETE_TASK -> {
+                    try {
+                        String[] pathParts = path.split("/");
+                        String taskId = pathParts[2];
+                        Task taskToDelete = this.tasks.getTask(Integer.parseInt(taskId));
+
+                        this.tasks.removeTask(taskToDelete);
+                        writeResponse(exchange, null, 201);
+                    } catch (Exception e) {
+                        LOGGER.severe("Error deleting task: " + e.getMessage());
+                        writeResponse(exchange, Map.of("error", "Error deleting task"), 500);
+                    }
+                }
+
                 default -> writeResponse(exchange, Map.of("error", "Endpoint not found"), 404);
             }
         } catch (Exception e) {
@@ -98,10 +104,14 @@ public class TasksHandler implements HttpHandler {
         }
         System.out.println("pathParts: " + pathParts);
 
-        if (requestPath.equals("/tasks") || requestMethod.equals("/tasks/") && requestMethod.equals("GET")) {
+        if (requestPath.equals("/tasks") && requestMethod.equals("GET")) {
             return Endpoint.GET_TASKS;
         } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("GET") && pathParts.size() == 2) {
             return Endpoint.GET_TASK;
+        } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("PUT") && pathParts.size() == 2) {
+            return Endpoint.UPDATE_TASK;
+        } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("DELETE") && pathParts.size() == 2) {
+            return Endpoint.DELETE_TASK;
         } else {
             return Endpoint.UNKNOWN;
         }
@@ -111,13 +121,11 @@ public class TasksHandler implements HttpHandler {
         if (exchange == null) {
             throw new IllegalArgumentException("Exchange cannot be null");
         }
-
         String responseString = gson.toJson(response);
         byte[] responseBytes = responseString.getBytes(DEFAULT_CHARSET);
 
         Headers headers = exchange.getResponseHeaders();
         headers.set("Content-Type", "application/json; charset=utf-8");
-
         exchange.sendResponseHeaders(responseCode, responseBytes.length);
 
         try (OutputStream os = exchange.getResponseBody()) {
@@ -128,7 +136,13 @@ public class TasksHandler implements HttpHandler {
         exchange.close();
     }
 
-    enum Endpoint {GET_TASKS, GET_TASK, UNKNOWN}
+    enum Endpoint {
+        GET_TASKS,
+        GET_TASK,
+        UPDATE_TASK,
+        DELETE_TASK,
+        UNKNOWN
+    }
 }
 
 

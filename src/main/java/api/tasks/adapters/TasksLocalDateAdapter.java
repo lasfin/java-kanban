@@ -1,4 +1,4 @@
-package api.tasks;
+package api.tasks.adapters;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-class TasksLocalDateAdapter extends TypeAdapter<LocalDate> {
+public class TasksLocalDateAdapter extends TypeAdapter<LocalDate> {
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Override
