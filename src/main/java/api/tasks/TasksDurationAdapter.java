@@ -6,18 +6,16 @@ import com.google.gson.stream.JsonWriter;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 
 public class TasksDurationAdapter extends TypeAdapter<Duration> {
-    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Override
-    public void write(final JsonWriter jsonWriter, final Duration duration) throws IOException {
-        jsonWriter.value(duration.toString());
+    public void write(final JsonWriter out, final Duration duration) throws IOException {
+        out.value(duration != null ? duration.toString() : null);
     }
 
     @Override
-    public Duration read(final JsonReader jsonReader) throws IOException {
-        return Duration.parse(jsonReader.nextString());
+    public Duration read(final JsonReader in) throws IOException {
+        return Duration.parse(in.nextString());
     }
 }

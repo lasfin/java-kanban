@@ -12,12 +12,12 @@ class TasksLocalDateAdapter extends TypeAdapter<LocalDate> {
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Override
-    public void write(final JsonWriter jsonWriter, final LocalDate localDate) throws IOException {
-        jsonWriter.value(localDate.format(dtf));
+    public void write(final JsonWriter out, final LocalDate localDate) throws IOException {
+        out.value(localDate  != null ? localDate.format(dtf) : null);
     }
 
     @Override
-    public LocalDate read(final JsonReader jsonReader) throws IOException {
-        return LocalDate.parse(jsonReader.nextString(), dtf);
+    public LocalDate read(final JsonReader in) throws IOException {
+        return LocalDate.parse(in.nextString(), dtf);
     }
 }

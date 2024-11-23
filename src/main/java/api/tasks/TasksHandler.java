@@ -11,7 +11,9 @@ import services.task.TaskService;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -29,11 +31,12 @@ public class TasksHandler implements HttpHandler {
         this.tasks = taskService;
 
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Task.class, new TasksDurationAdapter());
-        gsonBuilder.registerTypeAdapter(Task.class, new TasksLocalDateAdapter());
-        gsonBuilder.registerTypeAdapter(LocalDate.class, new TasksLocalDateAdapter());
+        gsonBuilder.registerTypeAdapter(Duration.class, new TasksDurationAdapter());
+        gsonBuilder.registerTypeAdapter(LocalDateTime.class, new TasksLocalDateAdapter());
 
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = gsonBuilder
+                .setPrettyPrinting()
+                .create();
     }
 
     @Override
