@@ -70,7 +70,12 @@ public class TasksHandler implements HttpHandler {
                             return;
                         }
                         String taskId = pathParts[2];
-                        writeResponse(exchange, Map.of("taskId", taskId), 200);
+                        var task = this.tasks.getTask(Integer.parseInt(taskId));
+                        if (task == null) {
+                            writeResponse(exchange, Map.of("error", "Task not found"), 404);
+                        } else {
+                            writeResponse(exchange, task, 200);
+                        }
                     } catch (Exception e) {
                         LOGGER.severe("Error getting task: " + e.getMessage());
                         writeResponse(exchange, Map.of("error", "Error retrieving task"), 500);
@@ -93,9 +98,9 @@ public class TasksHandler implements HttpHandler {
         }
         System.out.println("pathParts: " + pathParts);
 
-        if (requestPath.equals("/tasks") && requestMethod.equals("GET")) {
+        if (requestPath.equals("/tasks") || requestMethod.equals("/tasks/") && requestMethod.equals("GET")) {
             return Endpoint.GET_TASKS;
-        } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("POST")) {
+        } else if (pathParts.get(0).equals("tasks") && requestMethod.equals("GET") && pathParts.size() == 2) {
             return Endpoint.GET_TASK;
         } else {
             return Endpoint.UNKNOWN;
