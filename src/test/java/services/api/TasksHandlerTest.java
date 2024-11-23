@@ -129,8 +129,6 @@ public class TasksHandlerTest {
 
     @Test
     void shouldReturnTasksList() throws IOException, InterruptedException {
-        HttpResponse<String> response;
-
         HttpRequest requestTask1 = HttpRequest.newBuilder()
                 .uri(URI.create(baseUrl))
                 .header("Content-Type", "application/json")
