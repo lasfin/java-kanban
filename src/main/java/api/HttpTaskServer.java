@@ -2,6 +2,7 @@ package api;
 
 import api.tasks.handlers.HistoryHandler;
 import api.tasks.handlers.TasksHandler;
+import api.tasks.handlers.PrioritizedHandler;
 import com.sun.net.httpserver.HttpServer;
 import services.task.TaskService;
 
@@ -14,10 +15,13 @@ public class HttpTaskServer {
     public static void main(String[] args, TaskService taskService, int port) throws IOException {
         httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(port), 0);
+
         httpServer.createContext("/tasks", new TasksHandler(taskService));
         httpServer.createContext("/history", new HistoryHandler(taskService));
-        // httpServer.createContext("/prioritized", new PriotizedHandler(taskService));
+        httpServer.createContext("/prioritized", new PrioritizedHandler(taskService));
+
         httpServer.start();
+
         System.out.println("Starting server on port " + port);
     }
 

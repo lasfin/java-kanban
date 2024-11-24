@@ -6,13 +6,11 @@ import services.task.TaskService;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Logger;
 
-public class HistoryHandler extends BaseHandler {
+public class PrioritizedHandler extends BaseHandler {
     private final TaskService tasks;
-    private static final Logger LOGGER = Logger.getLogger(BaseHandler.class.getName());
 
-    public HistoryHandler(TaskService taskService) {
+    public PrioritizedHandler(TaskService taskService) {
         super(TaskGson.GSON);
 
         this.tasks = taskService;
@@ -22,8 +20,9 @@ public class HistoryHandler extends BaseHandler {
     protected void handleGet(HttpExchange exchange, String path) throws IOException {
         String[] pathParts = path.split("/");
 
+
         if (pathParts.length == 2) {
-            sendResponse(exchange, tasks.getHistory(), 200);
+            sendResponse(exchange, tasks.getPrioritizedTasks(), 200);
         } else {
             sendResponse(exchange, Map.of("error", "Not possible"), 400);
         }

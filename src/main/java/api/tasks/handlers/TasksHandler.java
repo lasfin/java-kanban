@@ -1,8 +1,6 @@
 package api.tasks.handlers;
 
-import api.tasks.adapters.TasksDurationAdapter;
-import api.tasks.adapters.TasksLocalDateAdapter;
-import com.google.gson.GsonBuilder;
+import api.tasks.model.TaskGson;
 import com.sun.net.httpserver.HttpExchange;
 import model.Status;
 import model.Task;
@@ -11,18 +9,13 @@ import services.task.TaskService;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 public class TasksHandler extends BaseHandler {
     private final TaskService tasks;
 
     public TasksHandler(TaskService taskService) {
-        super(new GsonBuilder()
-                .registerTypeAdapter(Duration.class, new TasksDurationAdapter())
-                .registerTypeAdapter(LocalDateTime.class, new TasksLocalDateAdapter())
-                .setPrettyPrinting()
-                .create());
+        super(TaskGson.GSON);
 
         this.tasks = taskService;
     }
