@@ -20,14 +20,19 @@ public class EpicsHandler extends BaseHandler {
     @Override
     protected void handleGet(HttpExchange exchange, String path) throws IOException {
         String[] pathParts = path.split("/");
+
         if (pathParts.length == 2) {
-            sendResponse(exchange, tasks.getTasks(), 200);
+            sendResponse(exchange, tasks.getEpics(), 200);
         } else if (pathParts.length == 3) {
             try {
-                Epic task = tasks.getEpic(Integer.parseInt(pathParts[2]));
-                sendResponse(exchange, task, 200);
+                Epic epic = tasks.getEpic(Integer.parseInt(pathParts[2]));
+                if (epic == null) {
+                    sendResponse(exchange, Map.of("error", "Epic not found"), 404);
+                } else {
+                    sendResponse(exchange, epic, 200);
+                }
             } catch (Exception e) {
-                sendResponse(exchange, Map.of("error", "Task not found"), 404);
+                sendResponse(exchange, Map.of("error", "Epic not found"), 404);
             }
         }
     }
@@ -47,7 +52,7 @@ public class EpicsHandler extends BaseHandler {
         if (!epicExists) {
             sendResponse(exchange, tasks.addEpic(newEpic), 201);
         } else {
-            Task existingTask = tasks.getTask(newEpic.getId());
+            Task existingTask = tasks.getEpic(newEpic.getId());
 
             if (existingTask != null) {
                 updateTask(newEpic);
@@ -62,12 +67,19 @@ public class EpicsHandler extends BaseHandler {
     protected void handleDelete(HttpExchange exchange, String path) throws IOException {
         String[] pathParts = path.split("/");
         if (pathParts.length == 3) {
+            boolean epicExists;
+            try {
+                epicExists = tasks.getEpic(Integer.parseInt(pathParts[2])) != null;
+            } catch (Exception e) {
+                epicExists = false;
+            }
             Epic epic = tasks.getEpic(Integer.parseInt(pathParts[2]));
-            if (epic != null) {
+
+            if (epicExists) {
                 tasks.removeEpic(epic);
                 sendResponse(exchange, null, 200);
             } else {
-                sendResponse(exchange, Map.of("error", "Task not found"), 404);
+                sendResponse(exchange, Map.of("error", "Epic not found"), 404);
             }
         }
     }

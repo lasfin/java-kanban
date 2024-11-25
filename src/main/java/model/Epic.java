@@ -5,7 +5,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Epic extends Task {
-    private final ArrayList<Subtask> subtasks = new ArrayList<>();
+    private ArrayList<Subtask> subtasks = new ArrayList<>();
+
+    public Epic() {
+        super("", "", Status.NEW);
+    }
 
     public Epic(String name, String description, Status status) {
         super(name, description, Status.NEW);

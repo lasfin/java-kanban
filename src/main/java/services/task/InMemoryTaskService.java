@@ -66,6 +66,9 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public Epic addEpic(Epic epic) {
+        System.out.println(epic);
+        System.out.println("adding epic");
+
         lastId++;
         epic.setId(lastId);
 
