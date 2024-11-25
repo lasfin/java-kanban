@@ -5,6 +5,11 @@ import java.time.LocalDateTime;
 public class Subtask extends Task {
     private int parentTaskId;
 
+    public Subtask(String name, String description, int parentTaskId) {
+        super(name, description, Status.NEW);
+        this.parentTaskId = parentTaskId;
+    }
+
     public Subtask(String name, String description, Status status, int parentTaskId) {
         super(name, description, status);
         this.parentTaskId = parentTaskId;

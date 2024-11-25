@@ -8,6 +8,7 @@ import services.task.TaskService;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class SubtasksHandler extends BaseHandler {
     private final TaskService tasks;
@@ -41,6 +42,8 @@ public class SubtasksHandler extends BaseHandler {
     protected void handlePost(HttpExchange exchange) throws IOException {
         String body = readBody(exchange);
         Subtask newSubtask = TaskGson.GSON.fromJson(body, Subtask.class);
+
+        Logger.getGlobal().info("Received new subtask: " + newSubtask);
 
         boolean subtaskExists;
         try {
