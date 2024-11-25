@@ -18,7 +18,7 @@ public interface TaskService {
 
      void removeTask(Task task);
 
-     void addEpic(Epic epic);
+     Epic addEpic(Epic epic);
 
      void removeEpic(Epic epic);
 

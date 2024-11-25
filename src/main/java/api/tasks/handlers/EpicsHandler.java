@@ -2,16 +2,17 @@ package api.tasks.handlers;
 
 import api.tasks.model.TaskGson;
 import com.sun.net.httpserver.HttpExchange;
+import model.Epic;
 import model.Task;
 import services.task.TaskService;
 
 import java.io.IOException;
 import java.util.Map;
 
-public class TasksHandler extends BaseHandler {
+public class EpicsHandler extends BaseHandler {
     private final TaskService tasks;
 
-    public TasksHandler(TaskService taskService) {
+    public EpicsHandler(TaskService taskService) {
         super(TaskGson.GSON);
         this.tasks = taskService;
     }
@@ -23,7 +24,7 @@ public class TasksHandler extends BaseHandler {
             sendResponse(exchange, tasks.getTasks(), 200);
         } else if (pathParts.length == 3) {
             try {
-                Task task = tasks.getTask(Integer.parseInt(pathParts[2]));
+                Epic task = tasks.getEpic(Integer.parseInt(pathParts[2]));
                 sendResponse(exchange, task, 200);
             } catch (Exception e) {
                 sendResponse(exchange, Map.of("error", "Task not found"), 404);
@@ -34,23 +35,23 @@ public class TasksHandler extends BaseHandler {
     @Override
     protected void handlePost(HttpExchange exchange) throws IOException {
         String body = readBody(exchange);
-        Task newTask = TaskGson.GSON.fromJson(body, Task.class);
+        Epic newEpic = TaskGson.GSON.fromJson(body, Epic.class);
 
-        boolean taskExists;
+        boolean epicExists;
         try {
-            taskExists = tasks.getTask(newTask.getId()) != null;
+            epicExists = tasks.getEpic(newEpic.getId()) != null;
         } catch (Exception e) {
-            taskExists = false;
+            epicExists = false;
         }
 
-        if (!taskExists) {
-            sendResponse(exchange, tasks.addTask(newTask), 201);
+        if (!epicExists) {
+            sendResponse(exchange, tasks.addEpic(newEpic), 201);
         } else {
-            Task existingTask = tasks.getTask(newTask.getId());
+            Task existingTask = tasks.getTask(newEpic.getId());
 
             if (existingTask != null) {
-                updateTask(newTask);
-                sendResponse(exchange, newTask, 201);
+                updateTask(newEpic);
+                sendResponse(exchange, newEpic, 201);
             } else {
                 sendResponse(exchange, Map.of("error", "Task not found"), 404);
             }
@@ -61,9 +62,9 @@ public class TasksHandler extends BaseHandler {
     protected void handleDelete(HttpExchange exchange, String path) throws IOException {
         String[] pathParts = path.split("/");
         if (pathParts.length == 3) {
-            Task task = tasks.getTask(Integer.parseInt(pathParts[2]));
-            if (task != null) {
-                tasks.removeTask(task);
+            Epic epic = tasks.getEpic(Integer.parseInt(pathParts[2]));
+            if (epic != null) {
+                tasks.removeEpic(epic);
                 sendResponse(exchange, null, 200);
             } else {
                 sendResponse(exchange, Map.of("error", "Task not found"), 404);

@@ -1,5 +1,6 @@
 package api;
 
+import api.tasks.handlers.EpicsHandler;
 import api.tasks.handlers.HistoryHandler;
 import api.tasks.handlers.TasksHandler;
 import api.tasks.handlers.PrioritizedHandler;
@@ -17,6 +18,7 @@ public class HttpTaskServer {
         httpServer.bind(new InetSocketAddress(port), 0);
 
         httpServer.createContext("/tasks", new TasksHandler(taskService));
+        httpServer.createContext("/epics", new EpicsHandler(taskService));
         httpServer.createContext("/history", new HistoryHandler(taskService));
         httpServer.createContext("/prioritized", new PrioritizedHandler(taskService));
 

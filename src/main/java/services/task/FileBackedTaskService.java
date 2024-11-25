@@ -182,9 +182,11 @@ public class FileBackedTaskService extends InMemoryTaskService {
     }
 
     @Override
-    public void addEpic(Epic epic) {
-        super.addEpic(epic);
+    public Epic addEpic(Epic epic) {
+        Epic newEpic = super.addEpic(epic);
         save();
+
+        return newEpic;
     }
 
     @Override

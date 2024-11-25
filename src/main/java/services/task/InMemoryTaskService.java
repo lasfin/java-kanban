@@ -65,7 +65,7 @@ public class InMemoryTaskService implements TaskService {
     }
 
     @Override
-    public void addEpic(Epic epic) {
+    public Epic addEpic(Epic epic) {
         lastId++;
         epic.setId(lastId);
 
@@ -73,6 +73,8 @@ public class InMemoryTaskService implements TaskService {
         if (epic.getStartTime() != null) {
             sortedTasks.add(epic);
         }
+
+        return epic;
     }
 
     @Override
