@@ -48,6 +48,10 @@ public class TasksHandler extends BaseHandler {
         } else {
             Task existingTask = tasks.getTask(newTask.getId());
 
+            if (existingTask.getId() == newTask.getId()) {
+                sendResponse(exchange, Map.of("error", "Task already exists"), 406);
+            }
+
             if (existingTask != null) {
                 updateTask(newTask);
                 sendResponse(exchange, newTask, 201);

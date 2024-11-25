@@ -21,15 +21,28 @@ public class EpicsHandler extends BaseHandler {
     protected void handleGet(HttpExchange exchange, String path) throws IOException {
         String[] pathParts = path.split("/");
 
+        // GET /epics
         if (pathParts.length == 2) {
             sendResponse(exchange, tasks.getEpics(), 200);
         } else if (pathParts.length == 3) {
+            // GET /epics/{id}
             try {
                 Epic epic = tasks.getEpic(Integer.parseInt(pathParts[2]));
                 if (epic == null) {
                     sendResponse(exchange, Map.of("error", "Epic not found"), 404);
                 } else {
                     sendResponse(exchange, epic, 200);
+                }
+            } catch (Exception e) {
+                sendResponse(exchange, Map.of("error", "Epic not found"), 404);
+            }
+        } else if (pathParts.length == 4) {
+            try {
+                Epic epic = tasks.getEpic(Integer.parseInt(pathParts[2]));
+                if (epic == null) {
+                    sendResponse(exchange, Map.of("error", "Epic not found"), 404);
+                } else {
+                    sendResponse(exchange, epic.getSubtasks(), 200);
                 }
             } catch (Exception e) {
                 sendResponse(exchange, Map.of("error", "Epic not found"), 404);
@@ -52,9 +65,12 @@ public class EpicsHandler extends BaseHandler {
         if (!epicExists) {
             sendResponse(exchange, tasks.addEpic(newEpic), 201);
         } else {
-            Task existingTask = tasks.getEpic(newEpic.getId());
+            Task existingEpic = tasks.getEpic(newEpic.getId());
+            if (existingEpic.getId() == newEpic.getId()) {
+                sendResponse(exchange, Map.of("error", "Epic already exists"), 406);
+            }
 
-            if (existingTask != null) {
+            if (existingEpic != null) {
                 updateTask(newEpic);
                 sendResponse(exchange, newEpic, 201);
             } else {
