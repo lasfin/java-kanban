@@ -81,7 +81,7 @@ public class InMemoryTaskService implements TaskService {
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
+    public Subtask addSubtask(Subtask subtask) {
         checkOverlap(subtask);
 
         lastId++;
@@ -96,6 +96,8 @@ public class InMemoryTaskService implements TaskService {
         if (subtask.getStartTime() != null) {
             sortedTasks.add(subtask);
         }
+
+        return subtask;
     }
 
     @Override

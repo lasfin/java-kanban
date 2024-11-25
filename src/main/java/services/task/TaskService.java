@@ -22,7 +22,7 @@ public interface TaskService {
 
      void removeEpic(Epic epic);
 
-     void addSubtask(Subtask subtask);
+     Subtask addSubtask(Subtask subtask);
 
      void removeSubtask(Subtask subtask);
 

@@ -1,9 +1,6 @@
 package api;
 
-import api.tasks.handlers.EpicsHandler;
-import api.tasks.handlers.HistoryHandler;
-import api.tasks.handlers.TasksHandler;
-import api.tasks.handlers.PrioritizedHandler;
+import api.tasks.handlers.*;
 import com.sun.net.httpserver.HttpServer;
 import services.task.TaskService;
 
@@ -19,6 +16,7 @@ public class HttpTaskServer {
 
         httpServer.createContext("/tasks", new TasksHandler(taskService));
         httpServer.createContext("/epics", new EpicsHandler(taskService));
+        httpServer.createContext("/subtask", new SubtasksHandler(taskService));
         httpServer.createContext("/history", new HistoryHandler(taskService));
         httpServer.createContext("/prioritized", new PrioritizedHandler(taskService));
 

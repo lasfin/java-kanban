@@ -190,9 +190,11 @@ public class FileBackedTaskService extends InMemoryTaskService {
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
-        super.addSubtask(subtask);
+    public Subtask addSubtask(Subtask subtask) {
+        Subtask st = super.addSubtask(subtask);
         save();
+
+        return st;
     }
 
     @Override
