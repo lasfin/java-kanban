@@ -2,13 +2,10 @@ package api.tasks.handlers;
 
 import api.tasks.model.TaskGson;
 import com.sun.net.httpserver.HttpExchange;
-import model.Status;
 import model.Task;
 import services.task.TaskService;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.time.Duration;
 import java.util.Map;
 
 public class TasksHandler extends BaseHandler {
@@ -37,20 +34,24 @@ public class TasksHandler extends BaseHandler {
 
     @Override
     protected void handlePost(HttpExchange exchange) throws IOException {
-        var json = gson.fromJson(new InputStreamReader(exchange.getRequestBody()), Map.class);
+        String body = readBody(exchange);
+        Task newTask = TaskGson.GSON.fromJson(body, Task.class);
 
-        if (json.get("id") == null) {
-            Task newTask = new Task(
-                    (String) json.get("name"),
-                    (String) json.get("description"),
-                    Status.NEW
-            );
+        boolean taskExists;
+        try {
+            taskExists = tasks.getTask(newTask.getId()) != null;
+        } catch (Exception e) {
+            taskExists = false;
+        }
+
+        if (!taskExists) {
             sendResponse(exchange, tasks.addTask(newTask), 201);
         } else {
-            Task existingTask = tasks.getTask(Integer.parseInt((String) json.get("id")));
+            Task existingTask = tasks.getTask(newTask.getId());
+
             if (existingTask != null) {
-                updateTask(existingTask, json);
-                sendResponse(exchange, existingTask, 201);
+                updateTask(newTask);
+                sendResponse(exchange, newTask, 201);
             } else {
                 sendResponse(exchange, Map.of("error", "Task not found"), 404);
             }
@@ -71,10 +72,7 @@ public class TasksHandler extends BaseHandler {
         }
     }
 
-    private void updateTask(Task task, Map<String, Object> json) {
-        if (json.get("name") != null) task.setName((String) json.get("name"));
-        if (json.get("description") != null) task.setDescription((String) json.get("description"));
-        if (json.get("status") != null) task.setStatus(Status.valueOf((String) json.get("status")));
-        if (json.get("duration") != null) task.setDuration(Duration.parse((String) json.get("duration")));
+    private void updateTask(Task newTask) {
+        tasks.updateTask(newTask);
     }
 }

@@ -1,10 +1,12 @@
 package api.tasks.handlers;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -16,6 +18,15 @@ public abstract class BaseHandler implements HttpHandler {
 
     protected BaseHandler(Gson gson) {
         this.gson = gson;
+    }
+
+    protected String readBody(HttpExchange httpExchange) throws IOException {
+        try (InputStream os = httpExchange.getRequestBody()) {
+            return new String(os.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (JsonSyntaxException exp) {
+            sendResponse(httpExchange, "Invalid JSON", 400);
+            return "";
+        }
     }
 
     @Override
@@ -32,6 +43,8 @@ public abstract class BaseHandler implements HttpHandler {
             }
         } catch (Exception e) {
             LOGGER.severe("Error handling request: " + e.getMessage());
+            LOGGER.info("Request path: " + path);
+            LOGGER.info(e.initCause(e).toString());
             sendResponse(exchange, Map.of("error", e.getMessage()), 500);
         }
     }

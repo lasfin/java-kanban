@@ -71,8 +71,7 @@ public class PrioritizedHandlerTest {
 
         Task task = new Task("Test task", "Test description", Status.NEW, 10, now);
         Task task2 = new Task("Test task2", "Test description2", Status.NEW, 20, later);
-        task.setId(1);
-        task2.setId(2);
+
         String jsonBodyTask = gson.toJson(task);
         String jsonBodyTask2 = gson.toJson(task2);
 
@@ -87,9 +86,6 @@ public class PrioritizedHandlerTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBodyTask2))
                 .build();
-
-        System.out.println("JSON for task 1: " + jsonBodyTask);
-        System.out.println("JSON for task 2: " + jsonBodyTask2);
 
         client.send(requestTask1, HttpResponse.BodyHandlers.ofString());
         client.send(requestTask2, HttpResponse.BodyHandlers.ofString());
@@ -109,6 +105,8 @@ public class PrioritizedHandlerTest {
         JsonElement jsonElement = parseString(responseListPrioritized.body());
 
         JsonArray jsonArray = jsonElement.getAsJsonArray();
+
+        Assertions.assertEquals(2, jsonArray.size());
     }
 }
 

@@ -52,10 +52,9 @@ public class InMemoryTaskService implements TaskService {
 
     @Override
     public Task addTask(Task task) {
-        checkOverlap(task);
-
         lastId++;
         task.setId(lastId);
+        checkOverlap(task);
 
         tasks.put(lastId, task);
         if (task.getStartTime() != null) {
