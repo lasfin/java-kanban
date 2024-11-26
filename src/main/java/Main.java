@@ -1,3 +1,4 @@
+import api.HttpTaskServer;
 import services.Managers;
 import services.task.TaskService;
 import model.Epic;
@@ -5,10 +6,19 @@ import model.Status;
 import model.Subtask;
 import model.Task;
 
+import java.io.IOException;
+
 public class Main {
 
-    public static void main(String[] args) {
-        runGeneralFlow();
+    public static void main(String[] args) throws IOException {
+        TaskService taskService = Managers.getDefault();
+
+        Task task1 = new Task("Create a first task", "Create a new task for the project", Status.NEW);
+        Task task2 = new Task("Create a second task", "Create a second task for the project", Status.NEW);
+        taskService.addTask(task1);
+        taskService.addTask(task2);
+
+        HttpTaskServer.main(args, taskService, 8080);
     }
 
     public static void runGeneralFlow() {

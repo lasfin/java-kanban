@@ -51,20 +51,24 @@ public class InMemoryTaskService implements TaskService {
     }
 
     @Override
-    public void addTask(Task task) {
-        checkOverlap(task);
-
+    public Task addTask(Task task) {
         lastId++;
         task.setId(lastId);
+        checkOverlap(task);
 
         tasks.put(lastId, task);
         if (task.getStartTime() != null) {
             sortedTasks.add(task);
         }
+
+        return task;
     }
 
     @Override
-    public void addEpic(Epic epic) {
+    public Epic addEpic(Epic epic) {
+        System.out.println(epic);
+        System.out.println("adding epic");
+
         lastId++;
         epic.setId(lastId);
 
@@ -72,10 +76,12 @@ public class InMemoryTaskService implements TaskService {
         if (epic.getStartTime() != null) {
             sortedTasks.add(epic);
         }
+
+        return epic;
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
+    public Subtask addSubtask(Subtask subtask) {
         checkOverlap(subtask);
 
         lastId++;
@@ -90,6 +96,8 @@ public class InMemoryTaskService implements TaskService {
         if (subtask.getStartTime() != null) {
             sortedTasks.add(subtask);
         }
+
+        return subtask;
     }
 
     @Override

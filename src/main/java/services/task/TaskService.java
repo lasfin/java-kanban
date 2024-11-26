@@ -14,15 +14,15 @@ public interface TaskService {
 
      ArrayList<Subtask> getSubtasks();
 
-     void addTask(Task task);
+     Task addTask(Task task);
 
      void removeTask(Task task);
 
-     void addEpic(Epic epic);
+     Epic addEpic(Epic epic);
 
      void removeEpic(Epic epic);
 
-     void addSubtask(Subtask subtask);
+     Subtask addSubtask(Subtask subtask);
 
      void removeSubtask(Subtask subtask);
 
